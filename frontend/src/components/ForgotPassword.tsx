@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Button } from '@mui/material';
+import { Modal, Box, Typography, TextField, Button, Grow} from '@mui/material';
 import { styled } from '@mui/system';
 
 const StyledModalBox = styled(Box)(({ theme }) => ({
@@ -11,8 +11,10 @@ const StyledModalBox = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(2, 4, 3),
     borderWidth: 2,
-    borderColor: 'white'
-}))
+    borderColor: 'white',
+    borderRadius: theme.spacing(2),
+}));
+
 
 interface ForgotPasswordProps {
   open: boolean;
