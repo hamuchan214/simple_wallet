@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Card, CardContent, CssBaseline, FormControl, FormLabel } from '@mui/material';
+import { Box, Button, TextField, Typography, Card, CardContent, CssBaseline, FormControl, FormLabel, Link } from '@mui/material';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
-import ForgotPassword from './ForgotPassword';  // ForgotPasswordが必要なら
+import ForgotPassword from './ForgotPassword';
 
 // ダークテーマ定義
 const darkTheme = createTheme({
@@ -32,17 +32,26 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const handleLogin = () => {
     console.log('Login attempt:', { username, password });
   };
+
+  const handleForgotPasswordOpen = () => {
+    setForgotPasswordOpen(true);
+  };
+
+  const handleForgotPasswordClose = () => {
+    setForgotPasswordOpen(false);
+  }
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Container maxWidth="xs" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <StyledCard variant="outlined">
-          <Typography variant="h4" align="center" gutterBottom>
+          <Typography variant="h4" align="left" gutterBottom>
             Login
           </Typography>
           <Box
@@ -91,8 +100,12 @@ const LoginForm = () => {
               Login
             </Button>
           </Box>
+          <Link component={Button} variant="body2" sx={{alignSelf: 'center', marginTop: 1}} onClick={handleForgotPasswordOpen}>
+            パスワードをお忘れですか?
+          </Link>
         </StyledCard>
       </Container>
+      <ForgotPassword open={forgotPasswordOpen} handleClose={handleForgotPasswordClose} />
     </ThemeProvider>
   );
 };
