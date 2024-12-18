@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link } from '@mui/material';
+import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link, CircularProgress } from '@mui/material';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ForgotPassword from './ForgotPassword';
@@ -32,10 +32,27 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Login attempt:', { username, password });
+  
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setIsSuccess(false);
+
+    // ログイン処理（例: サーバーにリクエスト送信）
+    try {
+      console.log('Login attempt:', { username, password });
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬的な2秒間の処理待ち
+      setIsSuccess(true); // 成功フラグをセット
+    } catch (error) {
+      console.error('Login failed:', error);
+      setIsSuccess(false);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPasswordOpen = () => {
@@ -92,12 +109,14 @@ const LoginForm = () => {
             </FormControl>
             <Button
               variant="contained"
-              color="primary"
+              color={isSuccess ? 'success' : 'primary'}
               fullWidth
-              sx={{ marginTop: '16px' }}
+              sx={{ marginTop: '16px', height: '56px' }}
+              type='submit'
+              disabled={isLoading}
               onClick={handleLogin}
             >
-              Login
+              {isLoading ? <CircularProgress size={24} color='inherit' /> : isSuccess ? 'Success' : 'Login'}
             </Button>
           </Box>
           <Link component={Button} variant="body2" sx={{alignSelf: 'center', marginTop: 1}} onClick={handleForgotPasswordOpen}>
