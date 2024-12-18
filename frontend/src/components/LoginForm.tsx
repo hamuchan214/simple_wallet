@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Card, CardContent, CssBaseline, FormControl, FormLabel, Link } from '@mui/material';
+import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link } from '@mui/material';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ForgotPassword from './ForgotPassword';
