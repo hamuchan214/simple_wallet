@@ -1,15 +1,17 @@
 import env from "dotenv";
 import jwt from "jsonwebtoken";
+import { AuthorizedUser } from "../models/authorized";
 
 env.config();
 export const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 
 export const generateToken = (id: string): string => {
-  return jwt.sign({ id }, JWT_SECRET, {
+  const payload: AuthorizedUser = { id };
+  return jwt.sign(payload, JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || "6h",
   });
 };
 
-export const verifyToken = (token: string): { id: string } => {
-  return jwt.verify(token, JWT_SECRET) as { id: string };
+export const verifyToken = (token: string): AuthorizedUser => {
+  return jwt.verify(token, JWT_SECRET) as AuthorizedUser;
 };
