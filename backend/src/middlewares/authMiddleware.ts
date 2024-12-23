@@ -2,15 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../configs/auth";
 import { logger } from "../configs/logger";
 
-// express.Requestに拡張でuser型を追加
-declare global {
-  namespace Express {
-    interface Request {
-      user?: { id: string };
-    }
-  }
-}
-
 export const authMiddleware = (
   req: Request,
   res: Response,

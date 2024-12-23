@@ -10,6 +10,6 @@ export const generateToken = (id: string): string => {
   });
 };
 
-export const verifyToken = (token: string): any => {
-  return jwt.verify(token, JWT_SECRET);
+export const verifyToken = (token: string): { id: string } => {
+  return jwt.verify(token, JWT_SECRET) as { id: string };
 };
