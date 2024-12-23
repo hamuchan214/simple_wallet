@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { logger } from "../configs/logger";
 
-export const errorHandlingMiddleware = (
+export const errorHandlerMiddleware = (
   err: Error,
   req: Request,
   res: Response,
