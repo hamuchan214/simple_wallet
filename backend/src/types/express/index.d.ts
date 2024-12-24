@@ -1,9 +1,9 @@
-import { AuthorizedUser } from "../../models/authorized";
+import { AuthenticatedUserData } from "../../models/authenticatedUser";
 
 declare global {
   namespace Express {
     interface Request {
-      user?: AuthorizedUser;
+      user?: AuthenticatedUserData;
     }
   }
 }
