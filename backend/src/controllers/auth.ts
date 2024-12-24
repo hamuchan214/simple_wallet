@@ -5,12 +5,12 @@ import { logger } from "../configs/logger";
 import { prisma } from "../configs/prisma";
 
 export const register = async (req: Request, res: Response) => {
-  const { userName, email, password } = req.body;
+  const { username, email, password } = req.body;
   try {
     const user = await prisma.user.create({
-      data: { userName, email, password: await bcrypt.hashSync(password, 10) },
+      data: { username, email, password: await bcrypt.hashSync(password, 10) },
     });
-    res.json({ status: `Register user ${userName} successful.` });
+    res.json({ status: `Register user ${username} successful.` });
   } catch (error) {
     logger.error("Error register user:", error);
     res.status(500).json({ error: "Register failed", errorMessage: error });
@@ -23,10 +23,10 @@ export const login = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({ where: { email } });
     if (user && (await bcrypt.compareSync(password, user.password))) {
       const token = generateToken(user.id);
-      logger.info(`(${user.userName}) login successfully`);
+      logger.info(`(${user.username}) login successfully`);
       res.json({ token, id: user.id });
     } else {
-      logger.warn(`Invalid credentials: ${user?.userName}`);
+      logger.warn(`Invalid credentials: ${user?.username}`);
       res.status(401).json({ error: "Invalid credentials" });
     }
   } catch (error) {
