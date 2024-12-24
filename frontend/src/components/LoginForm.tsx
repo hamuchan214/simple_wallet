@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link, CircularProgress } from '@mui/material';
+import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link, CircularProgress, Divider } from '@mui/material';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ForgotPassword from './ForgotPassword';
@@ -56,6 +56,10 @@ const LoginForm = () => {
         // トークンをローカルストレージに保存
         localStorage.setItem('token', response.data.token);
         // 必要に応じて、ログイン後のリダイレクト処理をここに追加
+      }
+      if (response.status === 401) {
+        setIsSuccess(false);
+        console.log("Invalid username or password");
       }
     } catch (error) {
       console.error('ログイン失敗:', error);
@@ -124,6 +128,7 @@ const LoginForm = () => {
               sx={{ marginTop: '16px', height: '56px' }}
               type='submit'
               disabled={isLoading}
+              onClick={handleLogin}
             >
               {isLoading ? <CircularProgress size={24} color='inherit' /> : isSuccess ? 'Success' : 'Login'}
             </Button>
@@ -131,6 +136,13 @@ const LoginForm = () => {
           <Link component={Button} variant="body2" sx={{alignSelf: 'center', marginTop: 1}} onClick={handleForgotPasswordOpen}>
             パスワードをお忘れですか?
           </Link>
+          <Divider>or</Divider>
+          <Typography sx={{ textAlign: 'center' }}>
+            アカウントが未登録ですか？
+            <Link href="/register" variant="body2" sx={{alignSelf: 'center', marginTop: 1}}>
+              新規登録
+            </Link>
+          </Typography>
         </StyledCard>
       </Container>
       <ForgotPassword open={forgotPasswordOpen} handleClose={handleForgotPasswordClose} />
