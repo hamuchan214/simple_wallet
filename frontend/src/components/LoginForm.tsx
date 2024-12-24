@@ -3,6 +3,8 @@ import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, For
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import ForgotPassword from './ForgotPassword';
+import axios from 'axios';
+import requests from '../utils/endpoints';
 
 // ダークテーマ定義
 const darkTheme = createTheme({
@@ -37,18 +39,26 @@ const LoginForm = () => {
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setIsLoading(true);
     setIsSuccess(false);
 
     // ログイン処理（例: サーバーにリクエスト送信）
     try {
-      console.log('Login attempt:', { username, password });
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // 模擬的な2秒間の処理待ち
-      setIsSuccess(true); // 成功フラグをセット
+      const response = await axios.post(requests.login, {
+        username,
+        password
+      });
+      
+      if (response.status === 200) {
+        setIsSuccess(true);
+        // トークンをローカルストレージに保存
+        localStorage.setItem('token', response.data.token);
+        // 必要に応じて、ログイン後のリダイレクト処理をここに追加
+      }
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('ログイン失敗:', error);
       setIsSuccess(false);
     } finally {
       setIsLoading(false);
@@ -114,7 +124,6 @@ const LoginForm = () => {
               sx={{ marginTop: '16px', height: '56px' }}
               type='submit'
               disabled={isLoading}
-              onClick={handleLogin}
             >
               {isLoading ? <CircularProgress size={24} color='inherit' /> : isSuccess ? 'Success' : 'Login'}
             </Button>
