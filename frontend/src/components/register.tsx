@@ -24,11 +24,13 @@ const Register = () => {
     setIsLoading(true);
     setIsSuccess(false);
 
+    const data = {
+      username,
+      password
+    };
+
     try {
-      const response = await axios.post(requests.register, {
-        username,
-        password
-      });
+      const response = await axios.post(requests.register, data);
 
       if (response.status === 201) {
         setIsSuccess(true);
