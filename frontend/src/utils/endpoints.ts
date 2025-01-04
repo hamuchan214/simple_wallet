@@ -1,9 +1,10 @@
-const BASE_URL = import.meta.env.BASE_URL;
+const BASE_URL: string = import.meta.env.VITE_API_URL;
+console.log('BASE_URL:', BASE_URL);
 
 const requests = {
   login: `${BASE_URL}/login`,
   register: `${BASE_URL}/register`,
-  // 他のエンドポイントをここに追加
+  userData: `${BASE_URL}/user`,
 };
 
 export default requests; 

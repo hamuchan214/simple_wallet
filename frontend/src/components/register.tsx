@@ -30,6 +30,7 @@ const Register = () => {
     };
 
     try {
+      console.log('Sending request to:', requests.register);
       const response = await axios.post(requests.register, data);
 
       if (response.status === 201) {
