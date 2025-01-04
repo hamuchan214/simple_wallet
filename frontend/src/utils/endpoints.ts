@@ -4,7 +4,7 @@ console.log('BASE_URL:', BASE_URL);
 const requests = {
   login: `${BASE_URL}/login`,
   register: `${BASE_URL}/register`,
-  userData: `${BASE_URL}/user`,
+  transactionData: `${BASE_URL}/transactions`,
 };
 
 export default requests; 

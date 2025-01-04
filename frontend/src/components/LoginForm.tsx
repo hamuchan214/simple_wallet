@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, FormLabel, Link, CircularProgress, Divider } from '@mui/material';
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
-import axios from 'axios';
+import axiosInstance, { setAuthToken } from '../utils/axios';
 import requests from '../utils/endpoints';
 
 // ダークテーマ定義
@@ -36,34 +37,54 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const navigate = useNavigate();
 
-  
   const handleLogin = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setIsLoading(true);
     setIsSuccess(false);
+    setErrorMsg('');
 
-    // ログイン処理（例: サーバーにリクエスト送信）
     try {
-      const response = await axios.post(requests.login, {
+      const response = await axiosInstance.post(requests.login, {
         username,
         password
       });
       
       if (response.status === 200) {
+        const { token, id, username } = response.data;
+        
+        setAuthToken(token);
+        localStorage.setItem('userId', id);
+        localStorage.setItem('username', username);
+        
         setIsSuccess(true);
-        // トークンをローカルストレージに保存
-        localStorage.setItem('token', response.data.token);
-        // 必要に応じて、ログイン後のリダイレクト処理をここに追加
+        
+        // 1秒後にダッシュボードへ移動
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       }
-      if (response.status === 401) {
-        setIsSuccess(false);
-        console.log("Invalid username or password");
-      }
-    } catch (error) {
+    } catch (error: any) {
       console.error('ログイン失敗:', error);
       setIsSuccess(false);
+      
+      if (error.response) {
+        switch (error.response.status) {
+          case 401:
+            setErrorMsg('ユーザー名またはパスワードが間違っています');
+            break;
+          case 404:
+            setErrorMsg('ユーザーが見つかりません');
+            break;
+          default:
+            setErrorMsg('ログインに失敗しました');
+        }
+      } else {
+        setErrorMsg('サーバーに接続できません');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -94,6 +115,12 @@ const LoginForm = () => {
             }}
             onSubmit={handleLogin}
           >
+            {errorMsg && (
+              <Typography color="error" textAlign="center">
+                {errorMsg}
+              </Typography>
+            )}
+            
             <FormControl>
               <FormLabel htmlFor="username">Username</FormLabel>
               <TextField
@@ -128,18 +155,32 @@ const LoginForm = () => {
               sx={{ marginTop: '16px', height: '56px' }}
               type='submit'
               disabled={isLoading}
-              onClick={handleLogin}
             >
-              {isLoading ? <CircularProgress size={24} color='inherit' /> : isSuccess ? 'Success' : 'Login'}
+              {isLoading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : isSuccess ? (
+                'ログイン成功！'
+              ) : (
+                'ログイン'
+              )}
             </Button>
           </Box>
-          <Link component={Button} variant="body2" sx={{alignSelf: 'center', marginTop: 1}} onClick={handleForgotPasswordOpen}>
+          <Link 
+            component={Button} 
+            variant="body2" 
+            sx={{alignSelf: 'center', marginTop: 1}} 
+            onClick={handleForgotPasswordOpen}
+          >
             パスワードをお忘れですか?
           </Link>
           <Divider>or</Divider>
           <Typography sx={{ textAlign: 'center' }}>
             アカウントが未登録ですか？
-            <Link href="/register" variant="body2" sx={{alignSelf: 'center', marginTop: 1}}>
+            <Link 
+              href="/register" 
+              variant="body2" 
+              sx={{alignSelf: 'center', marginTop: 1}}
+            >
               新規登録
             </Link>
           </Typography>
