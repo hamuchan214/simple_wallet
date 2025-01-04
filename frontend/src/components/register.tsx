@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import requests from "../utils/endpoints";
+import { setAuthToken } from "../utils/axios";
 
 const darkTheme = createTheme({
   palette: {
@@ -17,12 +18,14 @@ const Register = () => {
   const [password, setPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [errorMsg, setErrorMsg] = React.useState<string>('');
   const navigate = useNavigate();
 
   const handleRegister = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setIsLoading(true);
     setIsSuccess(false);
+    setErrorMsg('');
 
     const data = {
       username,
@@ -34,20 +37,37 @@ const Register = () => {
       const response = await axios.post(requests.register, data);
 
       if (response.status === 201) {
+        const { token, id, username } = response.data;
+        
+        setAuthToken(token);
+        
+        localStorage.setItem('userId', id);
+        localStorage.setItem('username', username);
+        
         setIsSuccess(true);
-        navigate("/");
+        
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1000);
       }
-      if (response.status === 400) {
-        setIsSuccess(false);
-        console.log("Invalid username or password");
-      }
-      if (response.status === 409) {
-        setIsSuccess(false);
-        console.log("User already exists");
-      }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Register failed:", error);
       setIsSuccess(false);
+      
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            setErrorMsg('ユーザー名またはパスワードが無効です');
+            break;
+          case 409:
+            setErrorMsg('このユーザー名は既に使用されています');
+            break;
+          default:
+            setErrorMsg('登録に失敗しました');
+        }
+      } else {
+        setErrorMsg('サーバーに接続できません');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +75,6 @@ const Register = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      {/* Corrected CssBaseline */}
       <CssBaseline />
       <Container
         maxWidth="xs"
@@ -79,6 +98,12 @@ const Register = () => {
             width: '100%',
           }}
         >
+          {errorMsg && (
+            <Typography color="error" textAlign="center">
+              {errorMsg}
+            </Typography>
+          )}
+          
           <TextField
             id="username"
             label="Username"
@@ -108,7 +133,13 @@ const Register = () => {
             disabled={isLoading}
             onClick={handleRegister}
           >
-            {isLoading ? <CircularProgress size={24} color='inherit' /> : isSuccess ? 'Success' : '登録する'}
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : isSuccess ? (
+              '登録成功！'
+            ) : (
+              '登録する'
+            )}
           </Button>
         </Box>
       </Container>
