@@ -17,7 +17,9 @@ export const register = async (req: Request, res: Response) => {
       data: { username, password: await bcrypt.hashSync(password, 10) },
     });
     logger.info(`Register user ${user.username} successful.`);
-    res.json({ status: `Register user ${user.username} successful.` });
+    res
+      .status(201)
+      .json({ status: `Register user ${user.username} successful.` });
   } catch (error) {
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
