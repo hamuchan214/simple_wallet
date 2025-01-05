@@ -4,8 +4,9 @@ import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ForgotPassword from './ForgotPassword';
-import axiosInstance, { setAuthToken } from '../utils/axios';
+import { setAuthToken } from '../utils/axios';
 import requests from '../utils/endpoints';
+import axios from 'axios';
 
 // ダークテーマ定義
 const darkTheme = createTheme({
@@ -48,7 +49,7 @@ const LoginForm = () => {
     setErrorMsg('');
 
     try {
-      const response = await axiosInstance.post(requests.login, {
+      const response = await axios.post(requests.login, {
         username,
         password
       });

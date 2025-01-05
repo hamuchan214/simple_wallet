@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import LoginForm from "./components/LoginForm";
-import { Dashboard } from "@mui/icons-material";
 import Register from "./components/register";
+import Dashboard from "./components/Dashboard";
 
 const App = () => {
   return(

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Card, Container, Grid, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, Container, Grid2, CssBaseline, CircularProgress } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axios from 'axios';
 import requests from '../utils/endpoints';
@@ -10,21 +10,46 @@ const darkTheme = createTheme({
   },
 });
 
+interface UserData {
+  username: string;
+  lastLogin: string;
+  totalTransactions: number;
+  recentActivities: Array<{
+    id: number;
+    type: string;
+    date: string;
+    description: string;
+  }>;
+  statistics: {
+    dailyAverage: number;
+    monthlyTotal: number;
+    successRate: number;
+  };
+}
+
 const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<UserData>({
     username: '',
     lastLogin: '',
-    // 他のユーザーデータをここに追加
+    totalTransactions: 0,
+    recentActivities: [],
+    statistics: {
+      dailyAverage: 0,
+      monthlyTotal: 0,
+      successRate: 0
+    }
   });
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(requests.userData);
+        console.log('データ取得開始');
+        const response = await axios.get(requests.transactionData);
+        console.log('取得したデータ:', response.data);
         setUserData(response.data);
       } catch (error) {
-        console.error('データの取得に失敗しました:', error);
+        console.error('データ取得エラーの詳細:', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,53 +68,9 @@ const Dashboard = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Container maxWidth="lg">
-        <Box sx={{ py: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            ダッシュボード
-          </Typography>
-          
-          <Grid container spacing={3}>
-            {/* ユーザー情報カード */}
-            <Grid item xs={12} md={6}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  ユーザー情報
-                </Typography>
-                <Typography>
-                  ユーザー名: {userData.username}
-                </Typography>
-                <Typography>
-                  最終ログイン: {userData.lastLogin}
-                </Typography>
-              </Card>
-            </Grid>
+      <CssBaseline />
+      <Container>
 
-            {/* 統計情報カード */}
-            <Grid item xs={12} md={6}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  統計情報
-                </Typography>
-                <Typography>
-                  ここに統計データを表示
-                </Typography>
-              </Card>
-            </Grid>
-
-            {/* アクティビティカード */}
-            <Grid item xs={12}>
-              <Card sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  最近のアクティビティ
-                </Typography>
-                <Typography>
-                  アクティビティログをここに表示
-                </Typography>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
       </Container>
     </ThemeProvider>
   );
