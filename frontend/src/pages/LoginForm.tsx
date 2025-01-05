@@ -55,7 +55,7 @@ const LoginForm = () => {
       });
       
       if (response.status === 200) {
-        const { token, id} = response.data;
+        const {token, id} = response.data;
         
         setAuthToken(token);
         localStorage.setItem('userId', id);

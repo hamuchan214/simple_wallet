@@ -31,7 +31,7 @@ export default function ButtonAppBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            ダッシュボード
+            simple-wallet
           </Typography>
           <Typography variant="body1" sx={{ mr: 2 }}>
             {username ? `ようこそ、${username}さん` : ''}
