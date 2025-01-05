@@ -55,11 +55,13 @@ const LoginForm = () => {
       });
       
       if (response.status === 200) {
-        const { token, id, username } = response.data;
+        const { token, id} = response.data;
         
         setAuthToken(token);
         localStorage.setItem('userId', id);
         localStorage.setItem('username', username);
+
+        console.log(username);
         
         setIsSuccess(true);
         
