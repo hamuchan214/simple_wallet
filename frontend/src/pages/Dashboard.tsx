@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Card, Container, Grid2, CssBaseline, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, Container,Grid2, CssBaseline, CircularProgress } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axios from 'axios';
 import requests from '../utils/endpoints';
+import { useNavigate } from 'react-router-dom';
+
+import ButtonAppBar from '../components/appbar';
 
 const darkTheme = createTheme({
   palette: {
@@ -28,6 +31,17 @@ interface UserData {
 }
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(!token){
+      navigate('/');
+      return;
+    }
+  }, [navigate]);
+
+
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState<UserData>({
     username: '',
@@ -69,9 +83,12 @@ const Dashboard = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Container>
+      <Box sx={{ flexGrow: 1 }}>
+        <ButtonAppBar />
+        <Container>
 
-      </Container>
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 };

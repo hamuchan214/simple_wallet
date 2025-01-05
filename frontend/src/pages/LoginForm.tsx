@@ -3,7 +3,7 @@ import { Box, Button, TextField, Typography, Card, CssBaseline, FormControl, For
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ForgotPassword from './ForgotPassword';
+import ForgotPassword from '../components/ForgotPassword';
 import { setAuthToken } from '../utils/axios';
 import requests from '../utils/endpoints';
 import axios from 'axios';
@@ -123,7 +123,6 @@ const LoginForm = () => {
             )}
             
             <FormControl>
-              <FormLabel htmlFor="username">Username</FormLabel>
               <TextField
                 id="username"
                 label="Username"
@@ -136,7 +135,6 @@ const LoginForm = () => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
                 id="password"
                 label="Password"

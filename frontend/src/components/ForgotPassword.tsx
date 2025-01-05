@@ -34,20 +34,11 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ open, handleClose }) =>
     <Modal open={open} onClose={handleClose}>
       <StyledModalBox>
         <Typography variant="h6" gutterBottom>
-          Reset Your Password
+          そんな機能はない
         </Typography>
         <Typography variant="body2" gutterBottom>
-          Enter your email address, and we’ll send you instructions to reset your password.
+          頑張って思い出してね
         </Typography>
-        <TextField
-          label="Email Address"
-          type="email"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
         <Button
           variant="contained"
           color="primary"
@@ -55,7 +46,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ open, handleClose }) =>
           onClick={handleSubmit}
           sx={{ marginTop: 2 }}
         >
-          Send Reset Link
+          わかった
         </Button>
       </StyledModalBox>
     </Modal>
