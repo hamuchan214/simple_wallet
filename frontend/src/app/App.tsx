@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import LoginForm from "./components/LoginForm";
-import Register from "./components/register";
-import Dashboard from "./components/Dashboard";
+import LoginForm from "../pages/LoginForm";
+import Register from "../pages/register";
+import Dashboard from "../pages/Dashboard";
 
 const App = () => {
   return(
