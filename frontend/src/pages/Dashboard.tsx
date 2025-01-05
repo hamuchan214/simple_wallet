@@ -59,7 +59,11 @@ const Dashboard = () => {
     const fetchUserData = async () => {
       try {
         console.log('データ取得開始');
-        const response = await axios.get(requests.transactionData);
+        const response = await axios.get(requests.transactionData,{
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
         console.log('取得したデータ:', response.data);
         setUserData(response.data);
       } catch (error) {
