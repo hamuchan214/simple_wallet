@@ -4,8 +4,12 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import axios from 'axios';
 import requests from '../utils/endpoints';
 import { useNavigate } from 'react-router-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
 import ButtonAppBar from '../components/appbar';
+import Sidebar from '../components/sidebar';
+import AddButton from '../components/addbutton';
 
 const darkTheme = createTheme({
   palette: {
@@ -32,6 +36,13 @@ interface UserData {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -87,12 +98,43 @@ const Dashboard = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Box sx={{ flexGrow: 1 }}>
-        <ButtonAppBar />
-        <Container>
-
-        </Container>
+      <Box sx={{ display: 'flex' }}>
+        <ButtonAppBar onMenuClick={handleDrawerToggle} />
+        
+        {/* モバイル用Sidebar */}
+        {isMobile && (
+          <Sidebar
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+          />
+        )}
+        
+        {/* デスクトップ用Sidebar */}
+        {!isMobile && (
+          <Sidebar
+            variant="permanent"
+            open={true}
+            onClose={() => {}}
+          />
+        )}
+        
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            p: 3,
+            mt: 8,
+            backgroundColor: 'background.default',
+            minHeight: '100vh',
+          }}
+        >
+          <Container>
+            {/* ここにダッシュボードのコンテンツを配置 */}
+          </Container>
+        </Box>
       </Box>
+      <AddButton />
     </ThemeProvider>
   );
 };
