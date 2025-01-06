@@ -115,7 +115,7 @@ const Dashboard = () => {
           <Sidebar
             variant="permanent"
             open={true}
-            onClose={() => {}}
+            onClose={handleDrawerToggle}
           />
         )}
         

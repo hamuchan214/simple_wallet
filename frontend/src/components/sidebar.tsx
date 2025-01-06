@@ -3,6 +3,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,8 +27,9 @@ export default function Sidebar({ open, onClose, variant }: SidebarProps) {
 
   const menuItems = [
     { text: 'ダッシュボード', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'カレンダー', icon: <CalendarMonthIcon />, path: '/calendar' },
     { text: 'ウォレット', icon: <AccountBalanceWalletIcon />, path: '/wallet' },
-    { text: '取引履歴', icon: <HistoryIcon />, path: '/history' },
+    { text: '履歴一覧', icon: <HistoryIcon />, path: '/history' },
     { text: '設定', icon: <SettingsIcon />, path: '/settings' },
   ];
 
