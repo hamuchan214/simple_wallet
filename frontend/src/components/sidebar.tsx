@@ -55,7 +55,13 @@ export default function Sidebar({ open, onClose, variant }: SidebarProps) {
         },
       }}
     >
-      <Box sx={{ overflow: 'auto', mt: 8 }}>
+      <Box sx={{
+          overflow: 'auto',
+          mt: 8,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column'
+          }}>
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
@@ -68,6 +74,7 @@ export default function Sidebar({ open, onClose, variant }: SidebarProps) {
             </ListItem>
           ))}
         </List>
+        <Box sx={{ flexGrow: 1 }} />
         <Divider />
         <List>
           <ListItem disablePadding>
