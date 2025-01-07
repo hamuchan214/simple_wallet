@@ -6,6 +6,7 @@ import { errorHandlerMiddleware } from "./middlewares/errorHandlerMiddleware";
 import { loggerMiddleware } from "./middlewares/loggerMiddleware";
 import authRoutes from "./routes/auth";
 import transactionRoutes from "./routes/transactions";
+import statisticsRoutes from "./routes/statistics";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get(`${API_PREFIX}/`, async (req: Request, res: Response) => {
 
 app.use(`${API_PREFIX}/`, authRoutes);
 app.use(`${API_PREFIX}/transactions`, authMiddleware, transactionRoutes);
+app.use(`${API_PREFIX}/statistics`, authMiddleware, statisticsRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
