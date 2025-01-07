@@ -9,14 +9,10 @@ export const getStatistics = async (req: Request, res: Response) => {
 
     const dateFilter = {
       userId,
-      ...(startDate && endDate
-        ? {
-            date: {
-              gte: new Date(startDate as string),
-              lte: new Date(endDate as string),
-            },
-          }
-        : {}),
+      date: {
+        ...(startDate ? { gte: new Date(startDate as string) } : {}),
+        ...(endDate ? { lte: new Date(endDate as string) } : {}),
+      },
     };
 
     const [totalExpense, totalIncome, transactionsByTag] = await Promise.all([
