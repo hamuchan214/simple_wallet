@@ -57,8 +57,17 @@ export const createTransaction = async (req: Request, res: Response) => {
 export const getTransactions = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    const { startDate, endDate } = req.query;
+
+    const dateFilter = {
+      date: {
+        ...(startDate ? { gte: new Date(startDate as string) } : {}),
+        ...(endDate ? { lte: new Date(endDate as string) } : {}),
+      },
+    };
+
     const transactions = await prisma.transaction.findMany({
-      where: { userId },
+      where: { userId, ...dateFilter },
     });
     logger.info("Transactions retrieved successfully.");
     res.json(transactions);
