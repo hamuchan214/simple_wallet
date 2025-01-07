@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/client"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  Transaction Transaction[]
+
+  @@map("user")
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  userId      String   @map("user_id")
+  amount      Int
+  description String
+  date        DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  TagsOnTransactions TagsOnTransactions[]
+
+  @@index([userId])
+  @@map("transaction")
+}
+
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  TagsOnTransactions TagsOnTransactions[]
+
+  @@map("tag")
+}
+
+model TagsOnTransactions {
+  transactionId Int         @map("transaction_id")
+  tagId         Int         @map("tag_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  tag           Tag         @relation(fields: [tagId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@id([transactionId, tagId])
+  @@index([transactionId])
+  @@index([tagId])
+  @@map("tags_on_transaction")
+}
+
+view TransactionWithTag {
+  transactionId Int      @map("transaction_id")
+  tagId         Int      @map("tag_id")
+  userId        String   @map("user_id")
+  amount        Int
+  description   String
+  date          DateTime
+  tagName       String   @map("tag_name")
+
+  @@id([transactionId, tagId])
+  @@map("transaction_with_tag")
+}
