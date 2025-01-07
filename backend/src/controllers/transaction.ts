@@ -14,7 +14,7 @@ export const createTransaction = async (req: Request, res: Response) => {
           userId,
           amount,
           description,
-          date,
+          date: new Date(date),
         },
       });
       const transactionTags = await Promise.all(

@@ -242,7 +242,7 @@ components:
           description: Transaction description
         date:
           type: string
-          format: date-time
+          format: date
           description: Transaction date
         tags:
           type: array
