@@ -2,8 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/client"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/client"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -19,6 +20,8 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   Transaction Transaction[]
+
+  @@map("user")
 }
 
 model Transaction {
@@ -35,6 +38,7 @@ model Transaction {
   TagsOnTransactions TagsOnTransactions[]
 
   @@index([userId])
+  @@map("transaction")
 }
 
 model Tag {
@@ -44,6 +48,8 @@ model Tag {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   TagsOnTransactions TagsOnTransactions[]
+
+  @@map("tag")
 }
 
 model TagsOnTransactions {
@@ -57,4 +63,5 @@ model TagsOnTransactions {
   @@id([transactionId, tagId])
   @@index([transactionId])
   @@index([tagId])
+  @@map("tags_on_transaction")
 }
