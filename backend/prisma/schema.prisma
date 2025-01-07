@@ -65,3 +65,16 @@ model TagsOnTransactions {
   @@index([tagId])
   @@map("tags_on_transaction")
 }
+
+view TransactionWithTag {
+  transactionId Int      @map("transaction_id")
+  tagId         Int      @map("tag_id")
+  userId        String   @map("user_id")
+  amount        Int
+  description   String
+  date          DateTime
+  tagName       String   @map("tag_name")
+
+  @@id([transactionId, tagId])
+  @@map("transaction_with_tag")
+}
