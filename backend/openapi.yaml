@@ -187,6 +187,35 @@ paths:
         "404":
           description: Transaction not found
 
+  /statistics:
+    get:
+      summary: Get a statistics
+      tags:
+        - Statistics
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+
+      responses:
+        "200":
+          description: basic statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Statistics"
+        "401":
+          description: Unauthorized
+
 components:
   schemas:
     AuthResponse:
@@ -230,6 +259,28 @@ components:
               type: string
             userId:
               type: string
+
+    tagAmount:
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: number
+
+    Statistics:
+      type: object
+      properties:
+        totalExpense:
+          type: number
+        totalIncome:
+          type: number
+        balance:
+          type: number
+        tagAmounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/tagAmount"
 
   securitySchemes:
     BearerAuth:
