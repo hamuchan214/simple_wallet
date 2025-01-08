@@ -14,3 +14,16 @@ export interface Transaction {
     id: number;
     user_id: number;
 }
+
+export interface Statistics {
+    totalExpense: number;
+    totalIncome: number;
+
+    tagAmounts: [
+        {
+            name: string;
+            amount: number;
+        }
+    ]
+}
+
