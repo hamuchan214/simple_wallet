@@ -30,10 +30,31 @@ export const RequestLogin = async (username: string, password: string): Promise<
             success: false,
             error: 'Login failed'
         };
-    } catch (error) {
+
+    } catch (error: any) {
+
+        if(error.response.status) {
+            switch (error.response.status) {
+                case 400:
+                    return {
+                        success: false,
+                        error: 'ユーザー名またはパスワードが無効です'
+                    };
+                  case 409:
+                    return{
+                        success: false,
+                        error: 'このユーザー名は既に使用されています'
+                    };
+                  default:
+                    return{
+                        success: false,
+                        error: '登録に失敗しました'
+                    };
+            }
+        }
         return {
             success: false,
-            error: 'Login failed'
+            error: 'サーバーに接続できません'
         };
     }
 }

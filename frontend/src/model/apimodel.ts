@@ -1,9 +1,10 @@
-//userデータ
+//セッションデータ
 export interface Session {
     id: number;
     token: string;
 }
 
+//取引データ
 export interface Transaction {
     amount: number;
     description: string;
@@ -15,6 +16,7 @@ export interface Transaction {
     user_id: number;
 }
 
+//統計データ
 export interface Statistics {
     totalExpense: number;
     totalIncome: number;
