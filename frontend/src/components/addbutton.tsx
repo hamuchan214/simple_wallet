@@ -24,8 +24,6 @@ export default function AddButton() {
         amount: transaction.type === 'income' ? transaction.amount : -transaction.amount,
         description: transaction.description,
         date: transaction.date.toISOString(),
-        id: 0,
-        user_id: 0,
         tags: []
       });
       console.log(result);

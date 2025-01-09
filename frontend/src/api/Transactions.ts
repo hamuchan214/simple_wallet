@@ -2,10 +2,11 @@ import axios from "axios";
 import requests from "../utils/endpoints";
 import { getAuthToken } from "../lib/localStorage";
 import { Transaction } from "../model/apimodel";
+import { APITransaction } from "../model/apimodel";
 
 export const getTransactionsAll = async (): Promise<{
     success: boolean;
-    transactions?: Transaction[];
+    transactions?: APITransaction[];
     error?: string;
     }> => {
         try {
@@ -46,7 +47,7 @@ export const getTransactionsAll = async (): Promise<{
 
 export const getTransactionById = async (id: number): Promise<{
     success: boolean;
-    transaction?: Transaction;
+    transaction?: APITransaction;
     error?: string;
 }> => {
     try {
@@ -91,6 +92,7 @@ export const getTransactionById = async (id: number): Promise<{
 
 export const createTransaction = async (transaction: Transaction): Promise<{
     success: boolean;
+    transaction?: APITransaction;
     error?: string;
 }> => {
     try {
@@ -104,7 +106,8 @@ export const createTransaction = async (transaction: Transaction): Promise<{
 
         if (response.status === 201) {
             return {
-                success: true
+                success: true,
+                transaction: response.data
             };
         }
         return {

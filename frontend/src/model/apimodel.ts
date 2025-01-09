@@ -11,9 +11,11 @@ export interface Transaction {
     date: string;
 
     tags: string[];
+}
 
+export interface APITransaction extends Transaction {
     id: number;
-    user_id: number;
+    userId: number;
 }
 
 //統計データ
