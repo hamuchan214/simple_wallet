@@ -13,3 +13,7 @@ export function setSession(token: string, id: string, username: string) {
   localStorage.setItem('userId', id);
   localStorage.setItem('username', username);
 }
+
+export function getAuthToken() {
+  return localStorage.getItem('token');
+}
