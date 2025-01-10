@@ -4,36 +4,29 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/dashboard/RecentTransactionsCard';
-
+import { getTransactionsAll } from '../api/Transactions';
+import { Statistics } from '../model/apimodel';
+import { getStatistics } from '../api/Statistic';
+import { APITransaction } from '../model/apimodel';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<{ id: number; name: string } | null>(null);
-
-  // ダミーデータ（後でAPIから取得するように変更）
-  const summaryData = {
-    income: 150000,
-    expense: 80000,
-    balance: 70000
-  };
-
-  const recentTransactions = [
-    {
-      id: 1,
-      type: 'income' as const,
-      amount: 50000,
-      description: '給料',
-      date: '2024-03-25'
-    },
-    {
-      id: 2,
-      type: 'expense' as const,
-      amount: 12000,
-      description: '食費',
-      date: '2024-03-24'
-    },
-  ];
+  const [summaryData, setSummaryData] = useState<Statistics | null>(null);
+  const [recentTransactions, setRecentTransactions] = useState<APITransaction[]>([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      const stats = await getStatistics();
+      if (stats.success && stats.statistics) {
+        setSummaryData(stats.statistics);
+      }
+
+      const transaction = await getTransactionsAll();
+      if (transaction.success && transaction.transactions) {
+        setRecentTransactions(transaction.transactions);
+      }
+    };
+
     const token = localStorage.getItem('token');
     const id = localStorage.getItem('userId');
     const name = localStorage.getItem('username');
@@ -47,9 +40,11 @@ const Dashboard = () => {
       id: parseInt(id, 10),
       name,
     });
+
+    fetchData();
   }, [navigate]);
 
-  if (!userData) {
+  if (!userData || !summaryData) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Typography variant="h6">Loading...</Typography>
@@ -64,21 +59,21 @@ const Dashboard = () => {
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="収入" 
-              amount={summaryData.income} 
+              amount={summaryData.totalIncome} 
               type="income" 
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="支出" 
-              amount={summaryData.expense} 
+              amount={summaryData.totalExpense} 
               type="expense" 
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="残高" 
-              amount={summaryData.balance} 
+              amount={summaryData.totalIncome - summaryData.totalExpense} 
               type="balance" 
             />
           </Grid>

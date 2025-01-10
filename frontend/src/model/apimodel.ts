@@ -14,8 +14,13 @@ export interface Transaction {
 }
 
 export interface APITransaction extends Transaction {
-    id: number;
-    userId: number;
+    id: string;
+    userId: string;
+}
+
+export interface ReactTransaction extends APITransaction {
+    type: 'income' | 'expense';
+    amount: number;
 }
 
 //統計データ

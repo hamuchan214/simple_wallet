@@ -1,17 +1,10 @@
 import { Card, CardContent, CardHeader, List, ListItem, ListItemText, ListItemIcon, Typography, Divider } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-
-interface Transaction {
-  id: number;
-  type: 'income' | 'expense';
-  amount: number;
-  description: string;
-  date: string;
-}
+import { APITransaction } from '../../model/apimodel';
 
 interface RecentTransactionsCardProps {
-  transactions: Transaction[];
+  transactions: APITransaction[];
 }
 
 export default function RecentTransactionsCard({ transactions }: RecentTransactionsCardProps) {
@@ -27,7 +20,7 @@ export default function RecentTransactionsCard({ transactions }: RecentTransacti
             <div key={transaction.id}>
               <ListItem>
                 <ListItemIcon>
-                  {transaction.type === 'income' ? (
+                  {transaction.amount > 0 ? (
                     <ArrowUpwardIcon color="success" />
                   ) : (
                     <ArrowDownwardIcon color="error" />
@@ -40,7 +33,7 @@ export default function RecentTransactionsCard({ transactions }: RecentTransacti
                 <Typography
                   variant="body1"
                   sx={{
-                    color: transaction.type === 'income' ? 'success.main' : 'error.main',
+                    color: transaction.amount > 0 ? 'success.main' : 'error.main',
                     fontWeight: 'bold'
                   }}
                 >
