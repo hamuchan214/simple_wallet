@@ -230,7 +230,6 @@ components:
       type: object
       required:
         - amount
-        - description
         - date
         - tags
       properties:
