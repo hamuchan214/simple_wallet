@@ -4,6 +4,8 @@ import AddIcon from '@mui/icons-material/Add';
 import TransactionDialog from './transactions/TransactionDialog';
 import { createTransaction } from '../api/Transactions';
 import { Snackbar, Alert } from '@mui/material';
+import { emitEvent } from '../utils/useEventBus';
+import { EVENT_TYPES } from '../utils/eventTypes';
 
 export default function AddButton() {
   const [open, setOpen] = useState(false);
@@ -35,6 +37,8 @@ export default function AddButton() {
           severity: 'success'
         });
         setOpen(false);
+        
+        emitEvent(EVENT_TYPES.TRANSACTION_UPDATED);
       } else {
         setSnackbar({
           open: true,

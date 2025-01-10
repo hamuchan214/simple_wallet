@@ -1,7 +1,7 @@
-import { EVENT_TYPE } from "./eventTypes";
+import { EVENT_TYPES } from "./eventTypes";
 import { useEffect } from "react";
 
-type EventType = typeof EVENT_TYPE[keyof typeof EVENT_TYPE];
+type EventType = typeof EVENT_TYPES[keyof typeof EVENT_TYPES];
 
 export const useEventBus = (eventType: EventType, callback: () => void) => {
     useEffect(() => {

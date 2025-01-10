@@ -1,30 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/dashboard/RecentTransactionsCard';
-import { getTransactionsAll } from '../api/Transactions';
-import { Statistics, APITransaction } from '../model/apimodel';
-import { getStatistics } from '../api/Statistic';
+import { useTransactionData } from '../lib/useTransactionData';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<{ id: number; name: string } | null>(null);
-  const [summaryData, setSummaryData] = useState<Statistics | null>(null);
-  const [recentTransactions, setRecentTransactions] = useState<APITransaction[]>([]);
-
-  const fetchData = async () => {
-    const stats = await getStatistics();
-    if (stats.success && stats.statistics) {
-      setSummaryData(stats.statistics);
-    }
-
-    const transaction = await getTransactionsAll();
-    if (transaction.success && transaction.transactions) {
-      setRecentTransactions(transaction.transactions);
-    }
-  };
+  const {
+    summaryData,
+    recentTransactions,
+    isLoading,
+    error,
+    fetchData
+  } = useTransactionData();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -36,20 +26,19 @@ const Dashboard = () => {
       return;
     }
 
-    setUserData({
-      id: parseInt(id, 10),
-      name,
-    });
-
     fetchData();
-  }, [navigate]);
+  }, [navigate, fetchData]);
 
-  if (!userData || !summaryData) {
+  if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Typography variant="h6">Loading...</Typography>
       </Box>
     );
+  }
+
+  if (!summaryData) {
+    return null;
   }
 
   return (

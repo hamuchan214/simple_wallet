@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { getStatistics } from "../api/Statistic";
 import { getTransactionsAll } from "../api/Transactions";
 import { useEventBus } from "../utils/useEventBus";
-import { EVENT_TYPE } from "../utils/eventTypes";
+import { EVENT_TYPES } from "../utils/eventTypes";
 import type { Statistics, APITransaction } from "../model/apimodel";
 
 export const useTransactionData = () => {
@@ -35,7 +35,7 @@ export const useTransactionData = () => {
         }
     }, []);
 
-    useEventBus(EVENT_TYPE.TRANSACTION_UPDATED, fetchData);
+    useEventBus(EVENT_TYPES.TRANSACTION_UPDATED, fetchData);
 
     return { 
         summaryData, 

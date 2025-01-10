@@ -17,3 +17,10 @@ export function setSession(token: string, id: string, username: string) {
 export function getAuthToken() {
   return localStorage.getItem('token');
 }
+
+export function checkSession() {
+  const token = localStorage.getItem('token');
+  const id = localStorage.getItem('userId');
+  const name = localStorage.getItem('username');
+  return token && id && name;
+}
