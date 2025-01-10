@@ -68,6 +68,7 @@ export const getTransactions = async (req: Request, res: Response) => {
 
     const transactions = await prisma.transaction.findMany({
       where: { userId, ...dateFilter },
+      orderBy: { date: "desc" },
     });
     logger.info("Transactions retrieved successfully.");
     res.json(transactions);
