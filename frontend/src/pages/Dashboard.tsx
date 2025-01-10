@@ -5,9 +5,8 @@ import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/dashboard/RecentTransactionsCard';
 import { getTransactionsAll } from '../api/Transactions';
-import { Statistics } from '../model/apimodel';
+import { Statistics, APITransaction } from '../model/apimodel';
 import { getStatistics } from '../api/Statistic';
-import { APITransaction } from '../model/apimodel';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<{ id: number; name: string } | null>(null);
