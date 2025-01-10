@@ -7,25 +7,26 @@ import RecentTransactionsCard from '../components/dashboard/RecentTransactionsCa
 import { getTransactionsAll } from '../api/Transactions';
 import { Statistics, APITransaction } from '../model/apimodel';
 import { getStatistics } from '../api/Statistic';
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<{ id: number; name: string } | null>(null);
   const [summaryData, setSummaryData] = useState<Statistics | null>(null);
   const [recentTransactions, setRecentTransactions] = useState<APITransaction[]>([]);
 
+  const fetchData = async () => {
+    const stats = await getStatistics();
+    if (stats.success && stats.statistics) {
+      setSummaryData(stats.statistics);
+    }
+
+    const transaction = await getTransactionsAll();
+    if (transaction.success && transaction.transactions) {
+      setRecentTransactions(transaction.transactions);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      const stats = await getStatistics();
-      if (stats.success && stats.statistics) {
-        setSummaryData(stats.statistics);
-      }
-
-      const transaction = await getTransactionsAll();
-      if (transaction.success && transaction.transactions) {
-        setRecentTransactions(transaction.transactions);
-      }
-    };
-
     const token = localStorage.getItem('token');
     const id = localStorage.getItem('userId');
     const name = localStorage.getItem('username');
