@@ -15,7 +15,8 @@
     "generate": "pnpify prisma generate",
     "migrate": "pnpify prisma migrate dev",
     "reset": "pnpify prisma migrate reset",
-    "seed": "ts-node src/seed.ts"
+    "seed": "ts-node src/seed.ts",
+    "create:view": "sqlite3 prisma/wallet.db \".read prisma/createView.sql\""
   },
   "devDependencies": {
     "@types/bcrypt": "~10.0.28-alpha",
