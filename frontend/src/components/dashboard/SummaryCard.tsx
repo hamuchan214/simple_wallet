@@ -6,6 +6,7 @@ interface SummaryCardProps {
   title: string;
   amount: number;
   type: 'income' | 'expense' | 'balance';
+  loading?: boolean;
 }
 
 export default function SummaryCard({ title, amount, type }: SummaryCardProps) {

@@ -5,9 +5,10 @@ import { APITransaction } from '../../model/apimodel';
 
 interface RecentTransactionsCardProps {
   transactions: APITransaction[];
+  loading?: boolean;
 }
 
-export default function RecentTransactionsCard({ transactions }: RecentTransactionsCardProps) {
+export default function RecentTransactionsCard({ transactions, loading }: RecentTransactionsCardProps) {
   return (
     <Card>
       <CardHeader 

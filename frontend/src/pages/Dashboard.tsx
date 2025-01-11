@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Box, Container, Typography, Grid } from '@mui/material';
+import { Container, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
@@ -29,18 +29,6 @@ const Dashboard = () => {
     fetchData();
   }, [navigate, fetchData]);
 
-  if (isLoading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Typography variant="h6">Loading...</Typography>
-      </Box>
-    );
-  }
-
-  if (!summaryData) {
-    return null;
-  }
-
   return (
     <Layout>
       <Container sx={{ mt: 4 }}>
@@ -48,26 +36,32 @@ const Dashboard = () => {
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="収入" 
-              amount={summaryData.totalIncome} 
-              type="income" 
+              amount={summaryData?.totalIncome ?? 0}
+              type="income"
+              loading={isLoading}
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="支出" 
-              amount={summaryData.totalExpense} 
-              type="expense" 
+              amount={summaryData?.totalExpense ?? 0}
+              type="expense"
+              loading={isLoading}
             />
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="残高" 
-              amount={summaryData.totalIncome - summaryData.totalExpense} 
-              type="balance" 
+              amount={(summaryData?.totalIncome ?? 0) - (summaryData?.totalExpense ?? 0)}
+              type="balance"
+              loading={isLoading}
             />
           </Grid>
           <Grid item xs={12}>
-            <RecentTransactionsCard transactions={recentTransactions} />
+            <RecentTransactionsCard 
+              transactions={recentTransactions} 
+              loading={isLoading}
+            />
           </Grid>
         </Grid>
       </Container>
