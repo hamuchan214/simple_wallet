@@ -93,6 +93,7 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
             <DatePicker
               label="日付"
               value={date}
+              format='yyyy/MM/dd'
               onChange={(newValue) => setDate(newValue)}
             />
           </LocalizationProvider>

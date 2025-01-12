@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, List, ListItem, ListItemText, ListItemIcon, Typography, Divider, Skeleton } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { APITransaction } from '../../model/apimodel';
+import { APITransaction } from '../model/apimodel';
 
 interface RecentTransactionsCardProps {
   transactions: APITransaction[];
