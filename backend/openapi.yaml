@@ -259,7 +259,7 @@ paths:
         "401":
           description: Unauthorized
         "409":
-          description: Tag already exists
+          description: Tag already exists or Tag is reserved by the system
 
   /tags/{id}:
     delete:
