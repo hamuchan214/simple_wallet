@@ -160,7 +160,9 @@ export const deleteTransaction = async (req: Request, res: Response) => {
       where: { id: Number(id), userId },
     });
     logger.info(`Transaction ${id} deleted successfully.`);
-    res.json({ message: `Transaction ${id} deleted successfully.` });
+    res
+      .status(204)
+      .json({ message: `Transaction ${id} deleted successfully.` });
   } catch (error) {
     logger.error(`Error deleting transaction ${id}:`, error);
     if (error instanceof Error) {

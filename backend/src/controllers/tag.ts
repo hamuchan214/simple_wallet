@@ -11,9 +11,7 @@ export const createTag = async (req: Request, res: Response) => {
     const systemTag = await prisma.systemTag.findUnique({ where: { name } });
     if (systemTag) {
       logger.warn(`Tag "${name}" is reserved by the system`);
-      res
-        .status(409)
-        .json({ error: `Tag "${name}" is reserved by the system.` });
+      res.status(409).json({ error: `Tag "${name}" x.` });
       return;
     }
 
@@ -80,7 +78,7 @@ export const deleteTag = async (req: Request, res: Response) => {
       where: { userId, id: Number(id) },
     });
     logger.info(`Tag ${id} deleted successfully.`);
-    res.json({ message: `Tag ${id} deleted successfully.` });
+    res.status(204).json({ message: `Tag ${id} deleted successfully.` });
   } catch (error) {
     logger.error(`Error deleting tag ${id}:`, error);
     if (error instanceof Error) {
