@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { logger } from "../configs/logger";
-import { prisma } from "../configs/prisma";
-import { Prisma } from "../generated/client";
+import { prisma, Prisma } from "../configs/prisma";
 
 export const createTag = async (req: Request, res: Response) => {
   const { name } = req.body;
