@@ -2,8 +2,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { generateToken } from "../configs/auth";
 import { logger } from "../configs/logger";
-import { prisma } from "../configs/prisma";
-import { Prisma } from "../generated/client";
+import { prisma, Prisma } from "../configs/prisma";
 
 export const register = async (req: Request, res: Response) => {
   const { username, password } = req.body;
