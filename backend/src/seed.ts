@@ -51,7 +51,7 @@ const main = async () => {
     );
   });
 
-  console.log(systemTags);
+  console.log(systemTags.map((tag) => ({ id: tag.id, name: tag.name })));
 };
 
 main()
