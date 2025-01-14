@@ -36,18 +36,20 @@ const main = async () => {
     { name: "雑費" },
   ];
 
-  const systemTags = await Promise.all(
-    systemTagNames.map(
-      async (tag) =>
-        await prisma.systemTag.upsert({
-          where: { name: tag.name },
-          update: {},
-          create: {
-            name: tag.name,
-          },
-        })
-    )
-  );
+  const systemTags = await prisma.$transaction(async (tx) => {
+    return await Promise.all(
+      systemTagNames.map(
+        async (tag) =>
+          await tx.systemTag.upsert({
+            where: { name: tag.name },
+            update: {},
+            create: {
+              name: tag.name,
+            },
+          })
+      )
+    );
+  });
 
   console.log(systemTags);
 };
