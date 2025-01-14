@@ -36,3 +36,10 @@ export interface Statistics {
     ]
 }
 
+export interface Tag{
+    name: string;
+}
+
+export interface APITag extends Tag{
+    id: string;
+}
