@@ -48,11 +48,13 @@ export const getTags = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
     const systemTags = await prisma.systemTag.findMany({
-      select: { id: true, name: true },
+      select: { name: true },
+      orderBy: { id: "asc" },
     });
     const customTags = await prisma.customTag.findMany({
       where: { userId },
       select: { id: true, name: true },
+      orderBy: { updatedAt: "desc" },
     });
     const tags = [...systemTags, ...customTags];
     logger.info("Tags retrieved successfully.");
