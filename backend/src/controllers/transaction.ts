@@ -17,28 +17,46 @@ export const createTransaction = async (req: Request, res: Response) => {
           date: new Date(date),
         },
       });
-      const transactionTags = await Promise.all(
+      await Promise.all(
         tags.map(async (tagName) => {
-          const tag = await tx.tag.findUnique({
+          const systemTag = await tx.systemTag.findUnique({
             where: { name: tagName },
             select: { id: true },
           });
-          if (!tag) {
-            const newTag = await tx.tag.create({ data: { name: tagName } });
+          if (systemTag) {
+            await tx.systemTagsOnTransactions.create({
+              data: { transactionId: transaction.id, tagId: systemTag.id },
+            });
+            return {
+              transactionId: transaction.id,
+              tagId: systemTag.id,
+            };
+          }
+          const customTag = await tx.customTag.findUnique({
+            where: { userId, name: tagName },
+            select: { id: true },
+          });
+          if (!customTag) {
+            const newTag = await tx.customTag.create({
+              data: { userId, name: tagName },
+            });
+            await tx.customTagsOnTransactions.create({
+              data: { transactionId: transaction.id, tagId: newTag.id },
+            });
             return {
               transactionId: transaction.id,
               tagId: newTag.id,
             };
           }
+          await tx.customTagsOnTransactions.create({
+            data: { transactionId: transaction.id, tagId: customTag.id },
+          });
           return {
             transactionId: transaction.id,
-            tagId: tag.id,
+            tagId: customTag.id,
           };
         })
       );
-      await tx.tagsOnTransactions.createMany({
-        data: transactionTags,
-      });
       return transaction;
     });
 

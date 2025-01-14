@@ -15,7 +15,7 @@ export const getStatistics = async (req: Request, res: Response) => {
       },
     };
 
-    const [totalExpense, totalIncome, transactionsByTag] = await Promise.all([
+    const [totalExpense, totalIncome, transactionsByTags] = await Promise.all([
       // 総支出
       prisma.transaction.aggregate({
         where: { ...dateFilter, amount: { lt: 0 } },
@@ -27,8 +27,8 @@ export const getStatistics = async (req: Request, res: Response) => {
         _sum: { amount: true },
       }),
       // タグ別集計
-      prisma.transactionWithTag.groupBy({
-        by: ["tagId"],
+      prisma.transactionWithTags.groupBy({
+        by: ["systemTagId", "customTagId"],
         where: {
           ...dateFilter,
         },
@@ -39,17 +39,32 @@ export const getStatistics = async (req: Request, res: Response) => {
     ]);
 
     // タグ名の取得
-    const tagIds = transactionsByTag.map((t) => t.tagId);
-    const tags = await prisma.tag.findMany({
+    const systemTagIds = transactionsByTags
+      .map((t) => t.systemTagId)
+      .filter((t) => t != null);
+    const systemTags = await prisma.systemTag.findMany({
       where: {
         id: {
-          in: tagIds,
+          in: systemTagIds,
+        },
+      },
+    });
+    const customTagIds = transactionsByTags
+      .map((t) => t.customTagId)
+      .filter((t) => t != null);
+    const customTags = await prisma.customTag.findMany({
+      where: {
+        id: {
+          in: customTagIds,
         },
       },
     });
 
-    const tagAmounts = transactionsByTag.map((stat) => ({
-      name: tags.find((t) => t.id === stat.tagId)?.name || "Unknown",
+    const tagAmounts = transactionsByTags.map((stat) => ({
+      name:
+        systemTags.find((t) => t.id === stat.systemTagId)?.name ||
+        customTags.find((t) => t.id === stat.customTagId)?.name ||
+        "Unknown",
       amount: stat._sum.amount || 0,
     }));
 

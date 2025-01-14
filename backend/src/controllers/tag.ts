@@ -6,8 +6,19 @@ import { Prisma } from "../generated/client";
 export const createTag = async (req: Request, res: Response) => {
   const { name } = req.body;
   try {
-    const tag = await prisma.tag.create({
-      data: { name },
+    const userId = req.user!.id;
+
+    const systemTag = await prisma.systemTag.findUnique({ where: { name } });
+    if (systemTag) {
+      logger.warn(`Tag "${name}" is reserved by the system`);
+      res
+        .status(409)
+        .json({ error: `Tag "${name}" is reserved by the system.` });
+      return;
+    }
+
+    const tag = await prisma.customTag.create({
+      data: { userId, name },
     });
     logger.info("Tag created successfully");
     res.json(tag);
@@ -36,7 +47,15 @@ export const createTag = async (req: Request, res: Response) => {
 
 export const getTags = async (req: Request, res: Response) => {
   try {
-    const tags = await prisma.tag.findMany();
+    const userId = req.user!.id;
+    const systemTags = await prisma.systemTag.findMany({
+      select: { id: true, name: true },
+    });
+    const customTags = await prisma.customTag.findMany({
+      where: { userId },
+      select: { id: true, name: true },
+    });
+    const tags = [...systemTags, ...customTags];
     logger.info("Tags retrieved successfully.");
     res.json(tags);
   } catch (error) {
@@ -48,16 +67,17 @@ export const getTags = async (req: Request, res: Response) => {
 export const deleteTag = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const tag = await prisma.tag.findUnique({
-      where: { id: Number(id) },
+    const userId = req.user!.id;
+    const tag = await prisma.customTag.findUnique({
+      where: { userId, id: Number(id) },
     });
     if (!tag) {
       logger.warn(`Tag ${id} not found.`);
       res.status(404).json({ error: `Tag ${id} not found.` });
       return;
     }
-    await prisma.tag.delete({
-      where: { id: Number(id) },
+    await prisma.customTag.delete({
+      where: { userId, id: Number(id) },
     });
     logger.info(`Tag ${id} deleted successfully.`);
     res.json({ message: `Tag ${id} deleted successfully.` });
