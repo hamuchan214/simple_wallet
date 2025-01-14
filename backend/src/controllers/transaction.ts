@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { logger } from "../configs/logger";
 import { prisma } from "../configs/prisma";
-import { CreateTransaction } from "../models/transaction";
+import { CreateTransaction, Transaction } from "../models/transaction";
 
 export const createTransaction = async (req: Request, res: Response) => {
   try {
@@ -84,10 +84,29 @@ export const getTransactions = async (req: Request, res: Response) => {
       },
     };
 
-    const transactions = await prisma.transaction.findMany({
+    const transactionsWithTags = await prisma.transactionWithTags.findMany({
       where: { userId, ...dateFilter },
-      orderBy: [{ date: "desc" }, { id: "desc" }],
+      orderBy: [{ date: "desc" }, { transactionId: "desc" }],
     });
+
+    // タグ情報をトランザクションごとにグループ化
+    const transactions = transactionsWithTags.reduce((acc, curr) => {
+      const existingTransaction = acc.find((t) => t.id === curr.transactionId);
+      if (existingTransaction && curr.tagName) {
+        existingTransaction.tags.push(curr.tagName);
+      } else {
+        acc.push({
+          id: curr.transactionId,
+          userId: curr.userId,
+          amount: curr.amount,
+          description: curr.description,
+          date: curr.date,
+          tags: curr.tagName ? [curr.tagName] : [],
+        });
+      }
+      return acc;
+    }, [] as Array<Transaction>);
+
     logger.info("Transactions retrieved successfully.");
     res.json(transactions);
   } catch (error) {
@@ -100,14 +119,29 @@ export const getTransaction = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const userId = req.user?.id;
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: Number(id), userId },
+    const transactionWithTags = await prisma.transactionWithTags.findMany({
+      where: {
+        transactionId: Number(id),
+        userId,
+      },
     });
-    if (!transaction) {
+
+    if (!transactionWithTags.length) {
       logger.warn(`Transaction ${id} not found.`);
       res.status(404).json({ error: `Transaction ${id} not found.` });
       return;
     }
+
+    // トランザクション情報とタグをまとめる
+    const transaction: Transaction = {
+      id: transactionWithTags[0].transactionId,
+      userId: transactionWithTags[0].userId,
+      amount: transactionWithTags[0].amount,
+      description: transactionWithTags[0].description,
+      date: transactionWithTags[0].date,
+      tags: transactionWithTags.map((t) => t.tagName).filter((t) => t != null),
+    };
+
     logger.info(`Transaction ${id} retrieved successfully.`);
     res.json(transaction);
   } catch (error) {
