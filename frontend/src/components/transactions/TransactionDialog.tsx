@@ -75,6 +75,8 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
             label="金額"
             type="number"
             value={amount}
+            error={parseInt(amount,10)<=0}
+            helperText={parseInt(amount,10)<=0?"正の値を入力してください":""}
             onChange={(e) => setAmount(e.target.value)}
             InputProps={{
               startAdornment: <InputAdornment position="start">¥</InputAdornment>,
@@ -104,7 +106,7 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
         <Button 
           onClick={handleSubmit} 
           variant="contained" 
-          disabled={!amount || !description || !date}
+          disabled={!amount || parseInt(amount, 10)<=0 || !description || !date}
         >
           追加
         </Button>
