@@ -10,7 +10,9 @@ export const createTag = async (req: Request, res: Response) => {
     const systemTag = await prisma.systemTag.findUnique({ where: { name } });
     if (systemTag) {
       logger.warn(`Tag "${name}" is reserved by the system`);
-      res.status(409).json({ error: `Tag "${name}" x.` });
+      res
+        .status(409)
+        .json({ error: `Tag "${name}" is reserved by the system.` });
       return;
     }
 
