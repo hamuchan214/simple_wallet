@@ -20,6 +20,7 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   Transaction Transaction[]
+  CustomTag   CustomTag[]
 
   @@map("user")
 }
@@ -28,53 +29,88 @@ model Transaction {
   id          Int      @id @default(autoincrement())
   userId      String   @map("user_id")
   amount      Int
-  description String
+  description String?
   date        DateTime
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id])
 
-  TagsOnTransactions TagsOnTransactions[]
+  SystemTagsOnTransactions SystemTagsOnTransactions[]
+  CustomTagsOnTransactions CustomTagsOnTransactions[]
 
   @@index([userId])
   @@map("transaction")
 }
 
-model Tag {
+model SystemTag {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  TagsOnTransactions TagsOnTransactions[]
+  SystemTagsOnTransactions SystemTagsOnTransactions[]
 
-  @@map("tag")
+  @@map("system_tag")
 }
 
-model TagsOnTransactions {
+model CustomTag {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  CustomTagsOnTransactions CustomTagsOnTransactions[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@map("custom_tag")
+}
+
+// システムタグとトランザクションの中間テーブル
+model SystemTagsOnTransactions {
   transactionId Int         @map("transaction_id")
   tagId         Int         @map("tag_id")
   transaction   Transaction @relation(fields: [transactionId], references: [id])
-  tag           Tag         @relation(fields: [tagId], references: [id])
+  systemTag     SystemTag   @relation(fields: [tagId], references: [id])
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@id([transactionId, tagId])
   @@index([transactionId])
   @@index([tagId])
-  @@map("tags_on_transaction")
+  @@map("system_tags_on_transaction")
 }
 
-view TransactionWithTag {
-  transactionId Int      @map("transaction_id")
-  tagId         Int      @map("tag_id")
-  userId        String   @map("user_id")
-  amount        Int
-  description   String
-  date          DateTime
-  tagName       String   @map("tag_name")
+// カスタムタグとトランザクションの中間テーブル
+model CustomTagsOnTransactions {
+  transactionId Int         @map("transaction_id")
+  tagId         Int         @map("tag_id")
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  customTag     CustomTag   @relation(fields: [tagId], references: [id])
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
 
   @@id([transactionId, tagId])
-  @@map("transaction_with_tag")
+  @@index([transactionId])
+  @@index([tagId])
+  @@map("custom_tags_on_transaction")
+}
+
+// トランザクションとタグの結合ビュー
+view TransactionWithTags {
+  transactionId Int      @id @map("transaction_id")
+  userId        String   @map("user_id")
+  amount        Int
+  description   String?
+  date          DateTime
+  systemTagId   Int?     @map("system_tag_id")
+  customTagId   Int?     @map("custom_tag_id")
+  tagName       String   @map("tag_name")
+
+  @@index([userId])
+  @@map("transaction_with_tags")
 }

@@ -1,6 +1,6 @@
 export interface CreateTransaction {
   amount: number;
   description: string;
-  date: Date;
+  date: string;
   tags: string[];
 }

@@ -1,45 +1,99 @@
-import { useState, useEffect } from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Container, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
+import SummaryCard from '../components/dashboard/SummaryCard';
+import RecentTransactionsCard from '../components/TransactionsCard';
+import { useTransactionData } from '../lib/useTransactionData';
 
 const Dashboard = () => {
+
   const navigate = useNavigate();
-  const [userData, setUserData] = useState<{ id: number; name: string } | null>(null);
+  const {
+    summaryData,
+    recentTransactions,
+    isLoading,
+    error,
+    fetchData
+  } = useTransactionData();
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'error' as 'error' | 'success'
+  });
 
   useEffect(() => {
-    // ローカルストレージからユーザーデータを取得
     const token = localStorage.getItem('token');
     const id = localStorage.getItem('userId');
     const name = localStorage.getItem('username');
 
     if (!token || !id || !name) {
-      // トークンがない場合、ログインページへリダイレクト
       navigate('/');
       return;
     }
 
-    // ユーザーデータを状態に設定
-    setUserData({
-      id: parseInt(id, 10),
-      name,
-    });
-  }, [navigate]);
+    fetchData();
+  }, [navigate, fetchData]);
 
-  if (!userData) {
-    // ローディング状態やログインエラー時の表示
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <Typography variant="h6">Loading...</Typography>
-      </Box>
-    );
-  }
+  useEffect(() => {
+    if (error) {
+      setSnackbar({
+        open: true,
+        message: error,
+        severity: 'error'
+      });
+    }
+  }, [error]);
 
   return (
     <Layout>
-      <Container>
-
+      <Container sx={{ mt: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            <SummaryCard 
+              title="収入" 
+              amount={summaryData?.totalIncome ?? 0}
+              type="income"
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <SummaryCard 
+              title="支出" 
+              amount={summaryData?.totalExpense ?? 0}
+              type="expense"
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <SummaryCard 
+              title="残高" 
+              amount={(summaryData?.totalIncome ?? 0) - (summaryData?.totalExpense ?? 0)}
+              type="balance"
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <RecentTransactionsCard 
+              transactions={recentTransactions} 
+              loading={isLoading}
+            />
+          </Grid>
+        </Grid>
       </Container>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false}))}
+      >
+        <Alert
+          severity='error'
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false}))}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 };
