@@ -102,15 +102,16 @@ model CustomTagsOnTransactions {
 
 // トランザクションとタグの結合ビュー
 view TransactionWithTags {
-  transactionId Int      @id @map("transaction_id")
+  transactionId Int      @map("transaction_id")
   userId        String   @map("user_id")
   amount        Int
   description   String?
   date          DateTime
   systemTagId   Int?     @map("system_tag_id")
   customTagId   Int?     @map("custom_tag_id")
-  tagName       String   @map("tag_name")
+  tagName       String?  @map("tag_name")
 
+  @@id([transactionId])
   @@index([userId])
   @@map("transaction_with_tags")
 }
