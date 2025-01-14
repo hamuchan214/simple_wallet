@@ -8,9 +8,8 @@ SELECT DISTINCT
     t.description,
     t.date,
     st.id as system_tag_id,
-    st.name as system_tag_name,
     ct.id as custom_tag_id,
-    ct.name as custom_tag_name
+    COALESCE(st.name, ct.name) as tag_name
 FROM
     "transaction" t
 LEFT JOIN system_tags_on_transaction stot
@@ -20,4 +19,6 @@ LEFT JOIN system_tag st
 LEFT JOIN custom_tags_on_transaction ctot
     ON t.id = ctot.transaction_id
 LEFT JOIN custom_tag ct
-    ON ctot.tag_id = ct.id;
+    ON ctot.tag_id = ct.id
+WHERE
+    st.id IS NOT NULL OR ct.id IS NOT NULL;

@@ -108,9 +108,8 @@ view TransactionWithTags {
   description   String?
   date          DateTime
   systemTagId   Int?     @map("system_tag_id")
-  systemTagName String?  @map("system_tag_name")
   customTagId   Int?     @map("custom_tag_id")
-  customTagName String?  @map("custom_tag_name")
+  tagName       String   @map("tag_name")
 
   @@index([userId])
   @@map("transaction_with_tags")

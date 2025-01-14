@@ -28,7 +28,7 @@ export const getStatistics = async (req: Request, res: Response) => {
       }),
       // タグ別集計
       prisma.transactionWithTags.groupBy({
-        by: ["systemTagId", "customTagId"],
+        by: ["tagName"],
         where: {
           ...dateFilter,
         },
@@ -38,33 +38,8 @@ export const getStatistics = async (req: Request, res: Response) => {
       }),
     ]);
 
-    // タグ名の取得
-    const systemTagIds = transactionsByTags
-      .map((t) => t.systemTagId)
-      .filter((t) => t != null);
-    const systemTags = await prisma.systemTag.findMany({
-      where: {
-        id: {
-          in: systemTagIds,
-        },
-      },
-    });
-    const customTagIds = transactionsByTags
-      .map((t) => t.customTagId)
-      .filter((t) => t != null);
-    const customTags = await prisma.customTag.findMany({
-      where: {
-        id: {
-          in: customTagIds,
-        },
-      },
-    });
-
     const tagAmounts = transactionsByTags.map((stat) => ({
-      name:
-        systemTags.find((t) => t.id === stat.systemTagId)?.name ||
-        customTags.find((t) => t.id === stat.customTagId)?.name ||
-        "Unknown",
+      name: stat.tagName,
       amount: stat._sum.amount || 0,
     }));
 
