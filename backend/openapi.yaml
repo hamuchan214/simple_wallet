@@ -290,7 +290,7 @@ components:
         token:
           type: string
         id:
-          type: string
+          type: number
 
     CreateTransaction:
       type: object
@@ -321,7 +321,7 @@ components:
         - type: object
           properties:
             id:
-              type: string
+              type: number
             userId:
               type: string
 
@@ -362,7 +362,7 @@ components:
         - type: object
           properties:
             id:
-              type: string
+              type: number
 
   securitySchemes:
     BearerAuth:
