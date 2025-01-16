@@ -14,15 +14,22 @@ import {
   Divider, 
   Skeleton 
 } from '@mui/material';
-import TransactionDialog from './transactions/TransactionDialog';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { APITransaction } from '../model/apimodel';
 import { useState } from 'react';
-import { updateTransaction } from '../api/Transactions';
-import { emitEvent } from '../utils/useEventBus';
-import { EVENT_TYPES } from '../utils/eventTypes';
+
+//TYPE import
+import { APITransaction } from '../../model/apimodel';
+
+//component import
+import TransactionDialog from './TransactionDialog';
+import WarningCard from '../WarningCard';
+
+//event bus import
+import { updateTransaction } from '../../api/Transactions';
+import { emitEvent } from '../../utils/useEventBus';
+import { EVENT_TYPES } from '../../utils/eventTypes';
 
 interface RecentTransactionsCardProps {
   transactions: APITransaction[];
@@ -43,6 +50,7 @@ export default function RecentTransactionsCard({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<APITransaction | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [showWarningCard, setShowWarningCard] = useState(false);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, transaction: APITransaction) => {
     setAnchorEl(event.currentTarget);
@@ -91,11 +99,24 @@ export default function RecentTransactionsCard({
   };
 
   const handleDelete = () => {
-    if (selectedTransaction && onDelete) {
-      onDelete(selectedTransaction);
+    if (selectedTransaction) {
+      setShowWarningCard(true);
     }
     handleMenuClose();
   };
+
+  const handleDeleteConfirm = () => {
+    if (selectedTransaction && onDelete) {
+      onDelete(selectedTransaction);
+    }
+    setShowWarningCard(false);
+    setSelectedTransaction(null)
+  }
+
+  const handleDeleteCancel = () => {
+    setShowWarningCard(false);
+    setSelectedTransaction(null);
+  }
 
   const displayTransactions = transactions.slice(0, limit);
 
@@ -163,6 +184,14 @@ export default function RecentTransactionsCard({
           </Menu>
         </CardContent>
       </Card>
+      <WarningCard
+        title="取引の削除"
+        message="この取引を削除してもよろしいですか？"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        open={showWarningCard}
+      />
+      
       {selectedTransaction && (
         <TransactionDialog
           open={editDialogOpen}
