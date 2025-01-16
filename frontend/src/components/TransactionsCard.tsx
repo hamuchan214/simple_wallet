@@ -38,7 +38,6 @@ export default function RecentTransactionsCard({
   loading,
   limit = 5, 
   title = '最近の取引',
-  onEdit,
   onDelete
 }: RecentTransactionsCardProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -52,7 +51,9 @@ export default function RecentTransactionsCard({
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedTransaction(null);
+    if (!editDialogOpen) {
+      setSelectedTransaction(null);
+    }
   };
 
   const handleEditSubmit = async ( updateData: {
@@ -165,7 +166,10 @@ export default function RecentTransactionsCard({
       {selectedTransaction && (
         <TransactionDialog
           open={editDialogOpen}
-          onClose={() => setEditDialogOpen(false)}
+          onClose={() => {
+            setEditDialogOpen(false);
+            setSelectedTransaction(null);
+          }}
           onSubmit={handleEditSubmit}
           initialData={{
             type: selectedTransaction.amount > 0 ? 'income' : 'expense',
