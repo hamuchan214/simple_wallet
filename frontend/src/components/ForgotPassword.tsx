@@ -22,10 +22,10 @@ interface ForgotPasswordProps {
 }
 
 const ForgotPassword: React.FC<ForgotPasswordProps> = ({ open, handleClose }) => {
-  //const [email, setEmail] = useState('');
+  const [email, _setEmail] = useState('');
 
   const handleSubmit = () => {
-    console.log('Password reset requested for:');
+    console.log('Password reset requested for:',email);
     // パスワードリセット処理をここに実装
     handleClose();
   };

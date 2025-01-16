@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { getTags, createTag, deleteTag } from "../api/Tags";
+import { getTags } from "../api/Tags";
 import { useEventBus } from "../utils/useEventBus";
 import { EVENT_TYPES } from "../utils/eventTypes";
 import type { APITag } from "../model/apimodel";
