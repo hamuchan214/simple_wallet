@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Dialog, 
   DialogTitle, 
@@ -27,13 +27,30 @@ interface TransactionDialogProps {
     description: string;
     date: Date;
   }) => void;
+  initialData?: {
+    type: 'income' | 'expense';
+    amount: number;
+    description: string;
+    date: Date;
+  };
+  mode?: 'create' | 'edit';
 }
 
-export default function TransactionDialog({ open, onClose, onSubmit }: TransactionDialogProps) {
-  const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [amount, setAmount] = useState<string>('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState<Date | null>(new Date());
+export default function TransactionDialog({ open, onClose, onSubmit, initialData, mode = 'create' }:
+  TransactionDialogProps) {
+  const [type, setType] = useState<'income' | 'expense'>(initialData?.type ?? 'expense');
+  const [amount, setAmount] = useState(initialData?.amount?.toString() ?? '');
+  const [description, setDescription] = useState(initialData?.description ?? '');
+  const [date, setDate] = useState<Date | null>(initialData?.date ?? new Date());
+
+  useEffect(() => {
+    if (initialData && open){
+      setType(initialData.type);
+      setAmount(Math.abs(initialData.amount).toString());
+      setDescription(initialData.description);
+      setDate(initialData.date);
+    }
+  }, [initialData, open]); 
 
   const handleSubmit = () => {
     if (!amount || !description || !date) return;
@@ -56,7 +73,9 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>取引を追加</DialogTitle>
+      <DialogTitle>
+        {mode === 'create' ? '取引を追加' : '取引を編集'}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
           <FormControl fullWidth>
@@ -108,7 +127,7 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
           variant="contained" 
           disabled={!amount || parseInt(amount, 10)<=0 || !description || !date}
         >
-          追加
+          {mode === 'create' ? '追加' : '更新'}
         </Button>
       </DialogActions>
     </Dialog>
