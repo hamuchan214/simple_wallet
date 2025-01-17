@@ -185,7 +185,7 @@ export default function RecentTransactionsCard({
         </CardContent>
       </Card>
       <WarningCard
-        title="取引の削除"
+        title="取引履歴の削除"
         message="この取引を削除してもよろしいですか？"
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
