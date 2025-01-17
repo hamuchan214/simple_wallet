@@ -3,7 +3,7 @@ import { Container, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
-import RecentTransactionsCard from '../components/TransactionsCard';
+import RecentTransactionsCard from '../components/transactions/TransactionsCard';
 import { useTransactionData } from '../lib/useTransactionData';
 
 const Dashboard = () => {
