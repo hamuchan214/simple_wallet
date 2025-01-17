@@ -2,7 +2,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import LoginForm from "../pages/LoginForm";
 import Register from "../pages/register";
 import Dashboard from "../pages/Dashboard";
-
+import History from "../pages/History";
 const App = () => {
   return (
     <Routes>
@@ -10,6 +10,7 @@ const App = () => {
       <Route path="/" element={<LoginForm />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/history" element={<History />} />
 
       {/* その他の未定義ルートは "/" にリダイレクト */}
       <Route path="*" element={<Navigate to="/" replace />} />
