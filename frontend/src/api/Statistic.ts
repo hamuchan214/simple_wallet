@@ -42,3 +42,47 @@ export const getStatistics = async (): Promise<{
         };
     }
 }
+
+export const getStatisticsbyPeriod = async (startDate: Date, endDate: Date): Promise<{
+    success: boolean;
+    statistics?: Statistics;
+    error?: string;
+}> => {
+    try {
+        const token = getAuthToken();
+        const response = await axios.get(requests.statistics, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            },
+            params: {
+                startDate: startDate.toISOString(),
+                endDate: endDate.toISOString()
+            }
+        });
+
+        if (response.status === 200) {
+            return {
+                success: true,
+                statistics: response.data
+            };
+        }
+        return {
+            success: false,
+            error: 'Failed to fetch statistics'
+        };
+    } catch (error: any) {
+        if (error.response.status) {
+            switch (error.response.status) {
+                case 401:
+                    return {
+                        success: false,
+                        error: 'Unauthorized'
+                    };
+            }
+        }
+        return {
+            success: false,
+            error: 'Failed to fetch statistics'
+        };
+    }
+}
