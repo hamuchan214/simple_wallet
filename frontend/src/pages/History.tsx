@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Container, Box, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { jaJP } from '@mui/x-data-grid/locales';
 import Layout from '../layout/Layout';
 import { useTransactionData } from '../lib/useTransactionData';
 import { useNavigate } from 'react-router-dom';
@@ -85,6 +86,7 @@ const History = () => {
             rows={Transactions}
             columns={columns}
             loading={isLoading}
+            localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
           />
         </Box>
       </Container>
