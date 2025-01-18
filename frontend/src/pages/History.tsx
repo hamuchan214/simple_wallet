@@ -11,12 +11,24 @@ const columns: GridColDef[] = [
   { 
     field: 'date',
     headerName: '日付',
-    width: 150
+    width: 150,
+    valueGetter: (value: string) => {
+      return new Date(value);
+    },
+    valueFormatter: (value: Date) => {
+      if (!value) return '';
+      return (value as Date).toLocaleDateString('ja-JP');
+    }
   },
   {
     field: 'amount',
     headerName: '金額',
-    width: 150
+    width: 150,
+    headerAlign: 'left',
+    align: 'left',
+    valueFormatter: (value: number) => {
+      return `￥${value.toLocaleString()}`;
+    }
   },
   {
     field: 'description',
