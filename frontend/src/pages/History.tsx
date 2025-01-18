@@ -1,25 +1,60 @@
 import { useEffect, useState } from 'react';
-import { Container, Box } from '@mui/material';
+import { Container, Box, Snackbar, Alert } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams, GridCellParams } from '@mui/x-data-grid';
 import { jaJP } from '@mui/x-data-grid/locales';
 import Layout from '../layout/Layout';
 import { useTransactionData } from '../lib/useTransactionData';
 import { APITransaction } from '../model/apimodel';
+import { useNavigate } from 'react-router-dom';
+import { checkSession } from '../lib/localStorage';
 
 const History = () => {
-  const { recentTransactions, isLoading, error } = useTransactionData();
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const navigate = useNavigate();
+
+  const {
+    Transactions,
+    isLoading,
+    error,
+    fetchData
+  } = useTransactionData();
+
+  useEffect(() => {
+    const session = checkSession();
+
+    if (!session) {
+      navigate('/');
+      return;
+    }
+
+    fetchData();
+  }, [navigate, fetchData]);
+
+  useEffect(() => {
+    if (error) {
+      setSnackbar({
+        open: true,
+        message: error,
+        severity: 'error'
+      });
+    }
+  }, [error]);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'error' as 'error' | 'success'
+  });
 
   const columns: GridColDef[] = [
     { 
       field: 'date', 
       headerName: '日付', 
       width: 150,
-      valueGetter: (params: GridRenderCellParams) => 
-        new Date(params.row.date).toLocaleDateString('ja-JP')
+      valueGetter: (params: GridRenderCellParams) => {
+        if (!params.row?.date) return '';
+        return new Date(params.row.date).toLocaleDateString('ja-JP');
+      }
     },
     { 
       field: 'description', 
@@ -33,12 +68,12 @@ const History = () => {
       width: 150,
       align: 'right',
       headerAlign: 'right',
-      valueGetter: (params: GridRenderCellParams) => 
-        `¥${params.row.amount.toLocaleString()}`,
+      valueGetter: (params: GridRenderCellParams) => {
+        if (!params.row?.amount) return '';
+        return `¥${params.row.amount.toLocaleString()}`;
+      },
       cellClassName: (params: GridCellParams) => {
-        if (params.value == null) {
-          return '';
-        }
+        if (!params.row?.amount) return '';
         return params.row.amount > 0 ? 'income' : 'expense';
       },
     },
@@ -46,8 +81,10 @@ const History = () => {
       field: 'tags',
       headerName: 'タグ',
       width: 200,
-      valueGetter: (params: GridRenderCellParams) => 
-        params.row.tags.join(', ')
+      valueGetter: (params: GridRenderCellParams) => {
+        if (!params.row?.tags) return '';
+        return params.row.tags.join(', ');
+      }
     }
   ];
 
@@ -65,7 +102,7 @@ const History = () => {
           },
         }}>
           <DataGrid
-            rows={recentTransactions}
+            rows={Transactions ?? []}
             columns={columns}
             loading={isLoading}
             initialState={{
@@ -83,6 +120,13 @@ const History = () => {
           />
         </Box>
       </Container>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false}))}
+      >
+        <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+      </Snackbar>
     </Layout>
   );
 };

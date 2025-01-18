@@ -11,7 +11,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const {
     summaryData,
-    recentTransactions,
+    Transactions,
     isLoading,
     error,
     fetchData
@@ -76,7 +76,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12}>
             <RecentTransactionsCard 
-              transactions={recentTransactions} 
+              transactions={Transactions} 
               loading={isLoading}
             />
           </Grid>
