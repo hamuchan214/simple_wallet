@@ -16,7 +16,7 @@ export const useTransactionData = () => {
         setError(null);
         
         try {
-            const [stats, transaction] = await Promise.all([
+            const [stats, transactions] = await Promise.all([
                 getStatistics(),
                 getTransactionsAll()
             ]);
@@ -24,8 +24,8 @@ export const useTransactionData = () => {
             if (stats.success && stats.statistics) {
                 setSummaryData(stats.statistics);
             }
-            if (transaction.success && transaction.transactions) {
-                setTransactions(transaction.transactions);
+            if (transactions.success && transactions.transactions) {
+                setTransactions(transactions.transactions);
             }
         } catch (error) {
             setError('Failed to fetch data');
