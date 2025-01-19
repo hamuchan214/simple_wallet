@@ -33,7 +33,6 @@ interface TransactionDialogProps {
   }) => void;
   tags: APITag[];
   selectedTags: APITag[];
-  setSelectedTags: (tags: APITag[]) => void;
   onTagsChange: (tags: APITag[]) => void;
   initialData?: {
     type: 'income' | 'expense';

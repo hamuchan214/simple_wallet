@@ -95,7 +95,6 @@ export default function AddButton() {
         onSubmit={handleSubmit}
         tags={tags}
         selectedTags={selectedTags}
-        setSelectedTags={setSelectedTags}
         onTagsChange={setSelectedTags}
       />
       <Snackbar
