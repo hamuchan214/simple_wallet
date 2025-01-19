@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Container, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+
+//component import
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
+
+//hook import
 import { useTransactionData } from '../lib/useTransactionData';
+
+//lib import
+import { checkSession } from '../lib/localStorage';
 
 const Dashboard = () => {
 
   const navigate = useNavigate();
   const {
     summaryData,
-    recentTransactions,
+    Transactions,
     isLoading,
     error,
     fetchData
@@ -24,11 +31,9 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const id = localStorage.getItem('userId');
-    const name = localStorage.getItem('username');
+    const session = checkSession();
 
-    if (!token || !id || !name) {
+    if (!session) {
       navigate('/');
       return;
     }
@@ -76,7 +81,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12}>
             <RecentTransactionsCard 
-              transactions={recentTransactions} 
+              transactions={Transactions} 
               loading={isLoading}
             />
           </Grid>

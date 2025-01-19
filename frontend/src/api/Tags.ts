@@ -26,19 +26,24 @@ export const getTags = async (): Promise<{
             error: 'Failed to fetch tags'
         }
     } catch (error: any) {
-        if(error.response.status) {
-            switch(error.response.status) {
+        if (error.response?.status) {
+            switch (error.response.status) {
                 case 401:
                     return {
                         success: false,
                         error: 'Unauthorized'
                     };
+                case 500:
+                    return {
+                        success: false,
+                        error: 'サーバーエラーが発生しました'
+                    };
             }
         }
-    }
-    return {
-        success: false,
-        error: 'Failed to fetch tags'
+        return {
+            success: false,
+            error: 'サーバーに接続できません'
+        };
     }
 }
 
