@@ -27,7 +27,7 @@ export const useTagData = () => {
         }
     }, []);
 
-    useEventBus(EVENT_TYPES.REFRESH_TAGS, fetchData);
+    useEventBus(EVENT_TYPES.TAGS_UPDATED, fetchData);
 
     return {
         tags,
