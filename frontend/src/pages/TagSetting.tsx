@@ -20,6 +20,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Layout from '../layout/Layout';
 import { useTagData } from '../lib/useTagData';
 import { createTag, deleteTag } from '../api/Tags';
+import { emitEvent } from '../utils/useEventBus';
+import { EVENT_TYPES } from '../utils/eventTypes';
 import WarningCard from '../components/WarningCard';
 
 const TagSetting = () => {
@@ -59,6 +61,7 @@ const TagSetting = () => {
           message: 'タグを追加しました',
           severity: 'success'
         });
+        emitEvent(EVENT_TYPES.TAGS_UPDATED);
         setNewTagName('');
         fetchData();
       } else {
@@ -90,6 +93,7 @@ const TagSetting = () => {
           severity: 'success'
         });
         fetchData();
+        emitEvent(EVENT_TYPES.TAGS_UPDATED);
       } else {
         throw new Error(result.error);
       }
