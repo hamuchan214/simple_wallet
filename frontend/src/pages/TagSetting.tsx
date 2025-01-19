@@ -12,7 +12,8 @@ import {
   Typography,
   Snackbar,
   Alert,
-  Paper
+  Paper,
+  Tooltip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -146,13 +147,18 @@ const TagSetting = () => {
                 <ListItem key={tag.id} divider>
                   <ListItemText primary={tag.name} />
                   <ListItemSecondaryAction>
+                    <Tooltip title = {!tag.id ? "システムタグは削除できません" : ""}>
+                    <span>
                     <IconButton
                       edge="end"
                       aria-label="delete"
                       onClick={() => handleDeleteClick(tag.id)}
+                      disabled={!tag.id}
                     >
                       <DeleteIcon />
                     </IconButton>
+                    </span>
+                    </Tooltip>
                   </ListItemSecondaryAction>
                 </ListItem>
               ))
