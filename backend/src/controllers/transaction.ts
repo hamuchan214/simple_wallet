@@ -1,7 +1,87 @@
 import { Request, Response } from "express";
 import { logger } from "../configs/logger";
-import { prisma } from "../configs/prisma";
+import { Prisma, prisma } from "../configs/prisma";
 import { CreateTransaction, Transaction } from "../models/transaction";
+
+const getTransactionWithAssociatedTags = async (
+  userId: string,
+  transactionId: number
+) => {
+  const transactionWithTags = await prisma.transactionWithTags.findMany({
+    where: { userId, transactionId },
+  });
+
+  // トランザクション情報とタグをまとめる
+  const transaction: Transaction = {
+    id: transactionWithTags[0].transactionId,
+    userId: transactionWithTags[0].userId,
+    amount: transactionWithTags[0].amount,
+    description: transactionWithTags[0].description,
+    date: transactionWithTags[0].date,
+    tags: transactionWithTags.map((t) => t.tagName).filter((t) => t != null),
+  };
+  return transaction;
+};
+
+// 共通関数の定義
+const handleTransactionTags = async (
+  tx: Prisma.TransactionClient,
+  userId: string,
+  transactionId: number,
+  tags: string[]
+) => {
+  // システムタグとカスタムタグを一括で取得
+  const [systemTags, customTags] = await Promise.all([
+    tx.systemTag.findMany({
+      where: { name: { in: tags } },
+      select: { id: true, name: true },
+    }),
+    tx.customTag.findMany({
+      where: {
+        AND: [{ userId }, { name: { in: tags } }],
+      },
+      select: { id: true, name: true },
+    }),
+  ]);
+
+  // 存在するタグ名を記録
+  const existingTagNames = new Set([
+    ...systemTags.map((t) => t.name),
+    ...customTags.map((t) => t.name),
+  ]);
+
+  // 新規カスタムタグを作成
+  const newCustomTags = await Promise.all(
+    tags
+      .filter((tagName) => !existingTagNames.has(tagName))
+      .map((tagName) =>
+        tx.customTag.create({
+          data: { userId, name: tagName },
+          select: { id: true },
+        })
+      )
+  );
+
+  // タグの紐付けを作成
+  await Promise.all([
+    ...systemTags.map((tag) =>
+      tx.systemTagsOnTransactions.create({
+        data: {
+          transactionId,
+          tagId: tag.id,
+        },
+      })
+    ),
+    ...[...customTags, ...newCustomTags].map((tag) =>
+      tx.customTagsOnTransactions.create({
+        data: {
+          transactionId,
+          tagId: tag.id,
+        },
+      })
+    ),
+  ]);
+};
 
 export const createTransaction = async (req: Request, res: Response) => {
   try {
@@ -17,51 +97,19 @@ export const createTransaction = async (req: Request, res: Response) => {
           date: new Date(date),
         },
       });
-      await Promise.all(
-        tags.map(async (tagName) => {
-          const systemTag = await tx.systemTag.findUnique({
-            where: { name: tagName },
-            select: { id: true },
-          });
-          if (systemTag) {
-            await tx.systemTagsOnTransactions.create({
-              data: { transactionId: transaction.id, tagId: systemTag.id },
-            });
-            return {
-              transactionId: transaction.id,
-              tagId: systemTag.id,
-            };
-          }
-          const customTag = await tx.customTag.findUnique({
-            where: { userId, name: tagName },
-            select: { id: true },
-          });
-          if (!customTag) {
-            const newTag = await tx.customTag.create({
-              data: { userId, name: tagName },
-            });
-            await tx.customTagsOnTransactions.create({
-              data: { transactionId: transaction.id, tagId: newTag.id },
-            });
-            return {
-              transactionId: transaction.id,
-              tagId: newTag.id,
-            };
-          }
-          await tx.customTagsOnTransactions.create({
-            data: { transactionId: transaction.id, tagId: customTag.id },
-          });
-          return {
-            transactionId: transaction.id,
-            tagId: customTag.id,
-          };
-        })
-      );
+
+      await handleTransactionTags(tx, userId, transaction.id, tags);
+
       return transaction;
     });
 
+    const createdTransaction = await getTransactionWithAssociatedTags(
+      userId,
+      transaction.id
+    );
+
     logger.info("Transaction created successfully");
-    res.json(transaction);
+    res.json(createdTransaction);
   } catch (error) {
     logger.error(`Error creating transaction:`, error);
     if (error instanceof Error) {
@@ -74,7 +122,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 
 export const getTransactions = async (req: Request, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user!.id;
     const { startDate, endDate } = req.query;
 
     const dateFilter = {
@@ -118,12 +166,9 @@ export const getTransactions = async (req: Request, res: Response) => {
 export const getTransaction = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const userId = req.user?.id;
+    const userId = req.user!.id;
     const transactionWithTags = await prisma.transactionWithTags.findMany({
-      where: {
-        transactionId: Number(id),
-        userId,
-      },
+      where: { userId, transactionId: Number(id) },
     });
 
     if (!transactionWithTags.length) {
@@ -132,15 +177,10 @@ export const getTransaction = async (req: Request, res: Response) => {
       return;
     }
 
-    // トランザクション情報とタグをまとめる
-    const transaction: Transaction = {
-      id: transactionWithTags[0].transactionId,
-      userId: transactionWithTags[0].userId,
-      amount: transactionWithTags[0].amount,
-      description: transactionWithTags[0].description,
-      date: transactionWithTags[0].date,
-      tags: transactionWithTags.map((t) => t.tagName).filter((t) => t != null),
-    };
+    const transaction = await getTransactionWithAssociatedTags(
+      userId,
+      Number(id)
+    );
 
     logger.info(`Transaction ${id} retrieved successfully.`);
     res.json(transaction);
@@ -153,19 +193,42 @@ export const getTransaction = async (req: Request, res: Response) => {
 export const patchTransaction = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const userId = req.user?.id;
-    const transaction = await prisma.transaction.findUnique({
-      where: { id: Number(id), userId },
+    const userId = req.user!.id;
+    const transactionId = Number(id);
+    const { amount, description, date, tags } = req.body as CreateTransaction;
+    const originalTransaction = await prisma.transaction.findUnique({
+      where: { userId, id: transactionId },
     });
-    if (!transaction) {
+    if (!originalTransaction) {
       logger.warn(`Transaction ${id} not found.`);
       res.status(404).json({ error: `Transaction ${id} not found.` });
       return;
     }
-    const updatedTransaction = await prisma.transaction.update({
-      where: { id: Number(id), userId },
-      data: req.body,
+
+    const transaction = await prisma.$transaction(async (tx) => {
+      const updatedTransaction = await tx.transaction.update({
+        where: { userId, id: transactionId },
+        data: { amount, description, date: new Date(date) },
+      });
+
+      // 既存のタグ紐付けを全て削除
+      await Promise.all([
+        tx.systemTagsOnTransactions.deleteMany({
+          where: { transactionId },
+        }),
+        tx.customTagsOnTransactions.deleteMany({
+          where: { transactionId },
+        }),
+      ]);
+
+      await handleTransactionTags(tx, userId, transactionId, tags);
+      return updatedTransaction;
     });
+
+    const updatedTransaction = await getTransactionWithAssociatedTags(
+      userId,
+      transaction.id
+    );
     logger.info(`Transaction ${id} updated successfully.`);
     res.json(updatedTransaction);
   } catch (error) {
@@ -181,9 +244,10 @@ export const patchTransaction = async (req: Request, res: Response) => {
 export const deleteTransaction = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const userId = req.user?.id;
+    const userId = req.user!.id;
+    const transactionId = Number(id);
     const transaction = await prisma.transaction.findUnique({
-      where: { id: Number(id), userId },
+      where: { userId, id: transactionId },
     });
     if (!transaction) {
       logger.warn(`Transaction ${id} not found.`);
@@ -191,8 +255,9 @@ export const deleteTransaction = async (req: Request, res: Response) => {
       return;
     }
     await prisma.transaction.delete({
-      where: { id: Number(id), userId },
+      where: { userId, id: transactionId },
     });
+
     logger.info(`Transaction ${id} deleted successfully.`);
     res
       .status(204)

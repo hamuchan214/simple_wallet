@@ -74,6 +74,17 @@ paths:
         - Transactions
       security:
         - BearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
       responses:
         "200":
           description: List of transactions
