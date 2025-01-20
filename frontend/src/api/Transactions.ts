@@ -147,7 +147,7 @@ export const updateTransaction = async (id: number, transaction: Transaction): P
 }> => {
     try {
         const token = getAuthToken();
-        const response = await axios.put(`${requests.transactions}/${id}`, transaction, {
+        const response = await axios.patch(`${requests.transactions}/${id}`, transaction, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
