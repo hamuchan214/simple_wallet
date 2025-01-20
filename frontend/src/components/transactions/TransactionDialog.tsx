@@ -30,6 +30,7 @@ interface TransactionDialogProps {
     amount: number;
     description: string;
     date: Date;
+    tags: APITag[];
   }) => void;
   tags: APITag[];
   selectedTags: APITag[];
@@ -39,6 +40,7 @@ interface TransactionDialogProps {
     amount: number;
     description: string;
     date: Date;
+    tags: APITag[];
   };
   mode?: 'create' | 'edit';
 }
@@ -66,7 +68,8 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
       type,
       amount: parseInt(amount, 10),
       description,
-      date
+      date,
+      tags: selectedTags
     });
 
     // フォームをリセット

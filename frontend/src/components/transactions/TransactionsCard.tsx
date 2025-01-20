@@ -77,11 +77,12 @@ export default function RecentTransactionsCard({
     }
   };
 
-  const handleEditSubmit = async ( updateData: {
+  const handleEditSubmit = async (updateData: {
     type: 'income' | 'expense';
     amount: number;
     description: string;
     date: Date;
+    tags: APITag[];
   }) => {
     if (!selectedTransaction) return;
     try {
@@ -89,7 +90,7 @@ export default function RecentTransactionsCard({
         amount: updateData.type === 'income' ? Number(updateData.amount) : -Number(updateData.amount),
         description: updateData.description,
         date: updateData.date.toISOString(),
-        tags: selectedTransaction.tags
+        tags: updateData.tags.map(tag => tag.name)
       });
 
       if(result.success) {
@@ -101,7 +102,6 @@ export default function RecentTransactionsCard({
       setEditDialogOpen(false);
       setSelectedTransaction(null);
     }
-
   }
 
   const handleEdit = () => {
@@ -217,7 +217,8 @@ export default function RecentTransactionsCard({
             type: selectedTransaction.amount > 0 ? 'income' : 'expense',
             amount: Math.abs(selectedTransaction.amount),
             description: selectedTransaction.description,
-            date: new Date(selectedTransaction.date)
+            date: new Date(selectedTransaction.date),
+            tags: selectedTransaction.tags.map(tagName => ({ id: '', name: tagName }))
           }}
           mode="edit"
           tags={tags}
