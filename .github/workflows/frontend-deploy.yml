@@ -1,14 +1,16 @@
-name: Frontend Build
+name: Frontend Deploy
 
 on:
   push:
+    branches: 
+      - main
     paths:
       - 'frontend/**'
       - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
