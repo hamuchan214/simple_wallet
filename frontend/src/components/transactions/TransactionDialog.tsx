@@ -11,12 +11,16 @@ import {
   Select, 
   MenuItem, 
   InputAdornment,
-  Box
+  Box,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { ja } from 'date-fns/locale/ja';
+
+import { APITag } from '../../model/apimodel';
 
 interface TransactionDialogProps {
   open: boolean;
@@ -27,6 +31,9 @@ interface TransactionDialogProps {
     description: string;
     date: Date;
   }) => void;
+  tags: APITag[];
+  selectedTags: APITag[];
+  onTagsChange: (tags: APITag[]) => void;
   initialData?: {
     type: 'income' | 'expense';
     amount: number;
@@ -36,7 +43,7 @@ interface TransactionDialogProps {
   mode?: 'create' | 'edit';
 }
 
-export default function TransactionDialog({ open, onClose, onSubmit, initialData, mode = 'create' }:
+export default function TransactionDialog({ open, onClose, onSubmit, tags, selectedTags, onTagsChange, initialData, mode = 'create' }:
   TransactionDialogProps) {
   const [type, setType] = useState<'income' | 'expense'>(initialData?.type ?? 'expense');
   const [amount, setAmount] = useState(initialData?.amount?.toString() ?? '');
@@ -118,6 +125,29 @@ export default function TransactionDialog({ open, onClose, onSubmit, initialData
               onChange={(newValue) => setDate(newValue)}
             />
           </LocalizationProvider>
+
+          <Autocomplete
+            multiple
+            options={tags}
+            value={selectedTags}
+            onChange={(_, newValue) => onTagsChange(newValue)}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="タグ"
+                placeholder="タグを選択"
+              />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  label={option.name}
+                  {...getTagProps({ index })}
+                />
+              ))
+            }
+          />
         </Box>
       </DialogContent>
       <DialogActions>

@@ -17,10 +17,10 @@ import {
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 //TYPE import
-import { APITransaction } from '../../model/apimodel';
+import { APITransaction, APITag } from '../../model/apimodel';
 
 //component import
 import TransactionDialog from './TransactionDialog';
@@ -30,6 +30,7 @@ import WarningCard from '../WarningCard';
 import { updateTransaction } from '../../api/Transactions';
 import { emitEvent } from '../../utils/useEventBus';
 import { EVENT_TYPES } from '../../utils/eventTypes';
+import { getTags } from '../../api/Tags';
 
 interface RecentTransactionsCardProps {
   transactions: APITransaction[];
@@ -51,6 +52,18 @@ export default function RecentTransactionsCard({
   const [selectedTransaction, setSelectedTransaction] = useState<APITransaction | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [showWarningCard, setShowWarningCard] = useState(false);
+  const [tags, setTags] = useState<APITag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<APITag[]>([]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      const result = await getTags();
+      if (result.success) {
+        setTags(result.tags || []);
+      }
+    };
+    fetchTags();
+  }, []);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, transaction: APITransaction) => {
     setAnchorEl(event.currentTarget);
@@ -207,6 +220,9 @@ export default function RecentTransactionsCard({
             date: new Date(selectedTransaction.date)
           }}
           mode="edit"
+          tags={tags}
+          selectedTags={selectedTags}
+          onTagsChange={setSelectedTags}
         />
       )}
     </>
