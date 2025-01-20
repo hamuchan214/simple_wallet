@@ -7,6 +7,7 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd(), '')
   
   return{
+    base: process.env.GITHUB_PAGES ? 'REPOSITORY_NAME' : './',
     plugins: [react()],
     server: {
       proxy: {
