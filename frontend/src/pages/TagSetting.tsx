@@ -108,7 +108,7 @@ const TagSetting = () => {
   };
 
   return (
-    <Layout>
+    <Layout hideAddButton>
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
           タグ設定
