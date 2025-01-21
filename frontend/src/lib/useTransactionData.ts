@@ -7,7 +7,7 @@ import type { Statistics, APITransaction } from "../model/apimodel";
 
 export const useTransactionData = () => {
     const [summaryData, setSummaryData] = useState<Statistics | null>(null);
-    const [recentTransactions, setRecentTransactions] = useState<APITransaction[]>([]);
+    const [Transactions, setTransactions] = useState<APITransaction[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -16,7 +16,7 @@ export const useTransactionData = () => {
         setError(null);
         
         try {
-            const [stats, transaction] = await Promise.all([
+            const [stats, transactions] = await Promise.all([
                 getStatistics(),
                 getTransactionsAll()
             ]);
@@ -24,8 +24,8 @@ export const useTransactionData = () => {
             if (stats.success && stats.statistics) {
                 setSummaryData(stats.statistics);
             }
-            if (transaction.success && transaction.transactions) {
-                setRecentTransactions(transaction.transactions);
+            if (transactions.success && transactions.transactions) {
+                setTransactions(transactions.transactions);
             }
         } catch (error) {
             setError('Failed to fetch data');
@@ -39,7 +39,7 @@ export const useTransactionData = () => {
 
     return { 
         summaryData, 
-        recentTransactions,
+        Transactions,
         isLoading,
         error,
         fetchData 

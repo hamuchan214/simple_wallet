@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Dialog, 
   DialogTitle, 
@@ -11,12 +11,16 @@ import {
   Select, 
   MenuItem, 
   InputAdornment,
-  Box
+  Box,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
 import { ja } from 'date-fns/locale/ja';
+
+import { APITag } from '../../model/apimodel';
 
 interface TransactionDialogProps {
   open: boolean;
@@ -26,14 +30,37 @@ interface TransactionDialogProps {
     amount: number;
     description: string;
     date: Date;
+    tags: APITag[];
   }) => void;
+  tags: APITag[];
+  selectedTags: APITag[];
+  onTagsChange: (tags: APITag[]) => void;
+  initialData?: {
+    type: 'income' | 'expense';
+    amount: number;
+    description: string;
+    date: Date;
+    tags: APITag[];
+  };
+  mode?: 'create' | 'edit';
 }
 
-export default function TransactionDialog({ open, onClose, onSubmit }: TransactionDialogProps) {
-  const [type, setType] = useState<'income' | 'expense'>('expense');
-  const [amount, setAmount] = useState<string>('');
-  const [description, setDescription] = useState('');
-  const [date, setDate] = useState<Date | null>(new Date());
+export default function TransactionDialog({ open, onClose, onSubmit, tags, selectedTags, onTagsChange, initialData, mode = 'create' }:
+  TransactionDialogProps) {
+  const [type, setType] = useState<'income' | 'expense'>(initialData?.type ?? 'expense');
+  const [amount, setAmount] = useState(initialData?.amount?.toString() ?? '');
+  const [description, setDescription] = useState(initialData?.description ?? '');
+  const [date, setDate] = useState<Date | null>(initialData?.date ?? new Date());
+
+  useEffect(() => {
+    if (initialData && open) {
+      setType(initialData.type);
+      setAmount(Math.abs(initialData.amount).toString());
+      setDescription(initialData.description);
+      setDate(initialData.date);
+      onTagsChange(initialData.tags);
+    }
+  }, [initialData, open, onTagsChange]); 
 
   const handleSubmit = () => {
     if (!amount || !description || !date) return;
@@ -42,7 +69,8 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
       type,
       amount: parseInt(amount, 10),
       description,
-      date
+      date,
+      tags: selectedTags
     });
 
     // フォームをリセット
@@ -56,7 +84,9 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>取引を追加</DialogTitle>
+      <DialogTitle>
+        {mode === 'create' ? '取引を追加' : '取引を編集'}
+      </DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
           <FormControl fullWidth>
@@ -99,6 +129,42 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
               onChange={(newValue) => setDate(newValue)}
             />
           </LocalizationProvider>
+
+          <Autocomplete
+            multiple
+            options={tags}
+            value={selectedTags}
+            onChange={(_, newValue) => {
+              console.log('Selected tags changed:', newValue);
+              onTagsChange(newValue);
+            }}
+            getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.name === value.name}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="タグ"
+                placeholder="タグを選択"
+              />
+            )}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...chipProps } = getTagProps({ index });
+                return (
+                  <Chip
+                    key={key}
+                    {...chipProps}
+                    label={option.name}
+                    onDelete={() => {
+                      const newTags = selectedTags.filter((_, i) => i !== index);
+                      console.log('Deleting tag, new tags:', newTags);
+                      onTagsChange(newTags);
+                    }}
+                  />
+                );
+              })
+            }
+          />
         </Box>
       </DialogContent>
       <DialogActions>
@@ -108,7 +174,7 @@ export default function TransactionDialog({ open, onClose, onSubmit }: Transacti
           variant="contained" 
           disabled={!amount || parseInt(amount, 10)<=0 || !description || !date}
         >
-          追加
+          {mode === 'create' ? '追加' : '更新'}
         </Button>
       </DialogActions>
     </Dialog>

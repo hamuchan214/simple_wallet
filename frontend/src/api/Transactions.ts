@@ -29,19 +29,24 @@ export const getTransactionsAll = async (): Promise<{
             };
         }
         catch (error: any) {
-            if (error.response.status) {
+            if (error.response?.status) {
                 switch (error.response.status) {
                     case 401: 
                         return {
                             success: false,
                             error: 'Unauthorized'
                         };
+                    case 500:
+                        return {
+                            success: false,
+                            error: 'サーバーエラーが発生しました'
+                        };
                 }
             }
-        }
-        return {
-            success: false,
-            error: 'Failed to fetch transactions'
+            return {
+                success: false,
+                error: 'サーバーに接続できません'
+            }
         }
 }
 
@@ -142,7 +147,7 @@ export const updateTransaction = async (id: number, transaction: Transaction): P
 }> => {
     try {
         const token = getAuthToken();
-        const response = await axios.put(`${requests.transactions}/${id}`, transaction, {
+        const response = await axios.patch(`${requests.transactions}/${id}`, transaction, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
