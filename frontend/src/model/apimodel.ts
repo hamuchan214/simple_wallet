@@ -27,6 +27,7 @@ export interface ReactTransaction extends APITransaction {
 export interface Statistics {
     totalExpense: number;
     totalIncome: number;
+    balance: number;
 
     tagAmounts: [
         {

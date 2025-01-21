@@ -15,9 +15,10 @@ const darkTheme = createTheme({
 
 interface LayoutProps {
   children: ReactNode;
+  hideAddButton?: boolean;
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, hideAddButton = false }: LayoutProps) => {
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -62,7 +63,7 @@ const Layout = ({ children }: LayoutProps) => {
           {children}
         </Box>
       </Box>
-      <AddButton />
+      {!hideAddButton && <AddButton />}
     </ThemeProvider>
   );
 };

@@ -1,11 +1,12 @@
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import HistoryIcon from '@mui/icons-material/History';
-import SettingsIcon from '@mui/icons-material/Settings';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useNavigate } from 'react-router-dom';
+
+import { logout } from '../lib/localStorage';
 
 interface SidebarProps {
   open: boolean;
@@ -19,18 +20,15 @@ export default function Sidebar({ open, onClose, variant }: SidebarProps) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
+    logout();
     navigate('/');
   };
 
   const menuItems = [
     { text: 'ダッシュボード', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'カレンダー', icon: <CalendarMonthIcon />, path: '/calendar' },
-    { text: 'ウォレット', icon: <AccountBalanceWalletIcon />, path: '/wallet' },
-    { text: '履歴一覧', icon: <HistoryIcon />, path: '/history' },
-    { text: '設定', icon: <SettingsIcon />, path: '/settings' },
+    { text: 'タグ設定', icon: <LocalOfferIcon />, path: '/tag-setting' },
+    { text: '履歴一覧', icon: <HistoryIcon />, path: '/history' }
   ];
 
   const handleNavigation = (path: string) => {

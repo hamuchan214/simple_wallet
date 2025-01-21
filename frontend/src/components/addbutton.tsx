@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Fab from '@mui/material/Fab';
 import AddIcon from '@mui/icons-material/Add';
 import TransactionDialog from './transactions/TransactionDialog';
@@ -6,9 +6,28 @@ import { createTransaction } from '../api/Transactions';
 import { Snackbar, Alert } from '@mui/material';
 import { emitEvent } from '../utils/useEventBus';
 import { EVENT_TYPES } from '../utils/eventTypes';
+import { getTags } from '../api/Tags';
+import { APITag } from '../model/apimodel';
 
 export default function AddButton() {
   const [open, setOpen] = useState(false);
+  const [tags, setTags] = useState<APITag[]>([]);
+  const [selectedTags, setSelectedTags] = useState<APITag[]>([]);
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const result = await getTags();
+        if (result.success) {
+          setTags(result.tags || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch tags:', error);
+      }
+    };
+    fetchTags();
+  }, []);
+  
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -26,7 +45,7 @@ export default function AddButton() {
         amount: transaction.type === 'income' ? transaction.amount : -transaction.amount,
         description: transaction.description,
         date: transaction.date.toISOString(),
-        tags: []
+        tags: selectedTags.map(tag => tag.name)
       });
       console.log(result);
 
@@ -37,6 +56,7 @@ export default function AddButton() {
           severity: 'success'
         });
         setOpen(false);
+        setSelectedTags([]);
         
         emitEvent(EVENT_TYPES.TRANSACTION_UPDATED);
       } else {
@@ -68,8 +88,14 @@ export default function AddButton() {
       </Fab>
       <TransactionDialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false);
+          setSelectedTags([]);
+        }}
         onSubmit={handleSubmit}
+        tags={tags}
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
       />
       <Snackbar
         open={snackbar.open}
