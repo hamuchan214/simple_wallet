@@ -112,6 +112,10 @@ export default function RecentTransactionsCard({
 
   const handleEdit = () => {
     if (selectedTransaction) {
+      const initialTags = selectedTransaction.tags.map(tagName => 
+        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+      );
+      setSelectedTags(initialTags);
       setEditDialogOpen(true);
     }
     handleMenuClose();
@@ -150,6 +154,26 @@ export default function RecentTransactionsCard({
   };
 
   const displayTransactions = transactions.slice(0, limit);
+
+  useEffect(() => {
+    if (selectedTransaction && editDialogOpen) {
+      const initialTags = selectedTransaction.tags.map(tagName => 
+        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+      );
+      setSelectedTags(initialTags);
+    }
+  }, [selectedTransaction, editDialogOpen, tags]);
+
+  const handleTagsChange = (newTags: APITag[]) => {
+    console.log('Tags changed:', newTags);
+    setSelectedTags(newTags);
+  };
+
+  const handleDialogClose = () => {
+    setEditDialogOpen(false);
+    setSelectedTransaction(null);
+    setSelectedTags([]);
+  };
 
   return (
     <>
@@ -226,22 +250,19 @@ export default function RecentTransactionsCard({
       {selectedTransaction && (
         <TransactionDialog
           open={editDialogOpen}
-          onClose={() => {
-            setEditDialogOpen(false);
-            setSelectedTransaction(null);
-          }}
+          onClose={handleDialogClose}
           onSubmit={handleEditSubmit}
           initialData={{
             type: selectedTransaction.amount > 0 ? 'income' : 'expense',
             amount: Math.abs(selectedTransaction.amount),
             description: selectedTransaction.description,
             date: new Date(selectedTransaction.date),
-            tags: selectedTransaction.tags.map(tagName => ({ id: '', name: tagName }))
+            tags: selectedTags
           }}
           mode="edit"
           tags={tags}
           selectedTags={selectedTags}
-          onTagsChange={setSelectedTags}
+          onTagsChange={handleTagsChange}
         />
       )}
     </>

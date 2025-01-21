@@ -53,13 +53,14 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
   const [date, setDate] = useState<Date | null>(initialData?.date ?? new Date());
 
   useEffect(() => {
-    if (initialData && open){
+    if (initialData && open) {
       setType(initialData.type);
       setAmount(Math.abs(initialData.amount).toString());
       setDescription(initialData.description);
       setDate(initialData.date);
+      onTagsChange(initialData.tags);
     }
-  }, [initialData, open]); 
+  }, [initialData, open, onTagsChange]); 
 
   const handleSubmit = () => {
     if (!amount || !description || !date) return;
@@ -133,8 +134,12 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
             multiple
             options={tags}
             value={selectedTags}
-            onChange={(_, newValue) => onTagsChange(newValue)}
+            onChange={(_, newValue) => {
+              console.log('Selected tags changed:', newValue);
+              onTagsChange(newValue);
+            }}
             getOptionLabel={(option) => option.name}
+            isOptionEqualToValue={(option, value) => option.name === value.name}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -150,6 +155,11 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
                     key={key}
                     {...chipProps}
                     label={option.name}
+                    onDelete={() => {
+                      const newTags = selectedTags.filter((_, i) => i !== index);
+                      console.log('Deleting tag, new tags:', newTags);
+                      onTagsChange(newTags);
+                    }}
                   />
                 );
               })
