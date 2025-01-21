@@ -1,5 +1,6 @@
 import axios from "axios";
 import { logout } from "../lib/localStorage";
+import { navigationHelper } from "./navigationHelper";
 
 const BASE_URL: string = import.meta.env.VITE_API_URL || ``;
 
@@ -14,7 +15,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       logout();
       // ログイン画面へリダイレクト
-      window.location.href = "/";
+      navigationHelper.navigate!("/");
     }
     return Promise.reject(error);
   }
