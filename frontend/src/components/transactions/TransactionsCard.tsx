@@ -27,7 +27,7 @@ import TransactionDialog from './TransactionDialog';
 import WarningCard from '../WarningCard';
 
 //event bus import
-import { updateTransaction } from '../../api/Transactions';
+import { updateTransaction, deleteTransaction } from '../../api/Transactions';
 import { emitEvent } from '../../utils/useEventBus';
 import { EVENT_TYPES } from '../../utils/eventTypes';
 import { getTags } from '../../api/Tags';
@@ -46,7 +46,7 @@ export default function RecentTransactionsCard({
   loading,
   limit = 5, 
   title = '最近の取引',
-  onDelete
+  //onDelete
 }: RecentTransactionsCardProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<APITransaction | null>(null);
@@ -66,14 +66,19 @@ export default function RecentTransactionsCard({
   }, []);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, transaction: APITransaction) => {
+    console.log('Opening menu for transaction:', transaction);
     setAnchorEl(event.currentTarget);
     setSelectedTransaction(transaction);
   };
 
+  useEffect(() => {
+    console.log('selectedTransaction updated:', selectedTransaction);
+  }, [selectedTransaction]);
+
   const handleMenuClose = () => {
     setAnchorEl(null);
     if (!editDialogOpen) {
-      setSelectedTransaction(null);
+      //setSelectedTransaction(null);
     }
   };
 
@@ -86,6 +91,7 @@ export default function RecentTransactionsCard({
   }) => {
     if (!selectedTransaction) return;
     try {
+      console.log('updateData', updateData);
       const result = await updateTransaction(Number(selectedTransaction.id), {
         amount: updateData.type === 'income' ? Number(updateData.amount) : -Number(updateData.amount),
         description: updateData.description,
@@ -106,6 +112,10 @@ export default function RecentTransactionsCard({
 
   const handleEdit = () => {
     if (selectedTransaction) {
+      const initialTags = selectedTransaction.tags.map(tagName => 
+        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+      );
+      setSelectedTags(initialTags);
       setEditDialogOpen(true);
     }
     handleMenuClose();
@@ -114,24 +124,56 @@ export default function RecentTransactionsCard({
   const handleDelete = () => {
     if (selectedTransaction) {
       setShowWarningCard(true);
+      handleMenuClose();
     }
-    handleMenuClose();
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedTransaction && onDelete) {
-      onDelete(selectedTransaction);
+  const handleDeleteConfirm = async () => {
+    if (!selectedTransaction) {
+      console.log('selectedTransaction is null');
+      return;
     }
-    setShowWarningCard(false);
-    setSelectedTransaction(null)
-  }
+    
+    try {
+      const result = await deleteTransaction(Number(selectedTransaction.id));
+      
+      if (result.success) {
+        emitEvent(EVENT_TYPES.TRANSACTION_UPDATED);
+      }
+    } catch (error) {
+      console.error('取引の削除に失敗しました', error);
+    } finally {
+      setShowWarningCard(false);
+      setSelectedTransaction(null);
+    }
+  };
 
   const handleDeleteCancel = () => {
     setShowWarningCard(false);
     setSelectedTransaction(null);
-  }
+  };
 
   const displayTransactions = transactions.slice(0, limit);
+
+  useEffect(() => {
+    if (selectedTransaction && editDialogOpen) {
+      const initialTags = selectedTransaction.tags.map(tagName => 
+        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+      );
+      setSelectedTags(initialTags);
+    }
+  }, [selectedTransaction, editDialogOpen, tags]);
+
+  const handleTagsChange = (newTags: APITag[]) => {
+    console.log('Tags changed:', newTags);
+    setSelectedTags(newTags);
+  };
+
+  const handleDialogClose = () => {
+    setEditDialogOpen(false);
+    setSelectedTransaction(null);
+    setSelectedTags([]);
+  };
 
   return (
     <>
@@ -208,22 +250,19 @@ export default function RecentTransactionsCard({
       {selectedTransaction && (
         <TransactionDialog
           open={editDialogOpen}
-          onClose={() => {
-            setEditDialogOpen(false);
-            setSelectedTransaction(null);
-          }}
+          onClose={handleDialogClose}
           onSubmit={handleEditSubmit}
           initialData={{
             type: selectedTransaction.amount > 0 ? 'income' : 'expense',
             amount: Math.abs(selectedTransaction.amount),
             description: selectedTransaction.description,
             date: new Date(selectedTransaction.date),
-            tags: selectedTransaction.tags.map(tagName => ({ id: '', name: tagName }))
+            tags: selectedTags
           }}
           mode="edit"
           tags={tags}
           selectedTags={selectedTags}
-          onTagsChange={setSelectedTags}
+          onTagsChange={handleTagsChange}
         />
       )}
     </>
