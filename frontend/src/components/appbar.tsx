@@ -5,6 +5,8 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useNavigate } from 'react-router-dom';
+import Logo from '../assets/logo.png';
+import { Icon } from '@mui/material';
 
 interface ButtonAppBarProps {
   onMenuClick: () => void;
@@ -38,6 +40,7 @@ export default function ButtonAppBar({ onMenuClick }: ButtonAppBarProps) {
         >
           <MenuIcon />
         </IconButton>
+        <img  src={Logo} style={{objectFit:"contain",height:"50px"}}/>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           simple-wallet
         </Typography>
