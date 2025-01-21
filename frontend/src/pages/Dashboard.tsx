@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
+import TagExpensesPieChart from '../components/dashboard/TagExpensesPieChart';
 
 //hook import
 import { useTransactionData } from '../lib/useTransactionData';
@@ -76,6 +77,12 @@ const Dashboard = () => {
               title="残高" 
               amount={(summaryData?.totalIncome ?? 0) - (summaryData?.totalExpense ?? 0)}
               type="balance"
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TagExpensesPieChart 
+              statistics={summaryData}
               loading={isLoading}
             />
           </Grid>
