@@ -31,6 +31,7 @@ export const getStatistics = async (req: Request, res: Response) => {
         by: ["tagName"],
         where: {
           ...dateFilter,
+          NOT: { tagName: null },
         },
         _sum: {
           amount: true,
