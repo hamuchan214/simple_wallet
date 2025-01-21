@@ -54,7 +54,7 @@ export const createTag = async (tag: Tag): Promise<{
 }> => {
     try {
         const token = getAuthToken();
-        const response = await axios.post(requests.transactions, tag, {
+        const response = await axios.post(requests.tags, tag, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
