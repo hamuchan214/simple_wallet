@@ -1,11 +1,14 @@
-import { Route, Routes, Navigate } from "react-router-dom";
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import LoginForm from "../pages/LoginForm";
 import Register from "../pages/register";
 import Dashboard from "../pages/Dashboard";
 import History from "../pages/History";
 import TagSetting from "../pages/TagSetting";
+import { navigationHelper } from "../utils/navigationHelper";
 
 const App = () => {
+  const navigate = useNavigate();
+  navigationHelper.navigate = navigate;
   return (
     <Routes>
       {/* ログインページ */}
