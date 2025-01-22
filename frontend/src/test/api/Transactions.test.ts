@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import axios from 'axios'
+import axiosInstance from '../../utils/axios'
 import { getTransactionsAll, createTransaction } from '../../api/Transactions'
 import { getAuthToken } from '../../lib/localStorage'
+import { AxiosError, AxiosResponse } from 'axios'
 
-// axiosをモック化
-vi.mock('axios')
+// axiosInstanceをモック化
+vi.mock('../../utils/axios')
 vi.mock('../../lib/localStorage')
 
 describe('Transactions API', () => {
@@ -19,7 +20,7 @@ describe('Transactions API', () => {
         { id: '2', amount: -2000, description: 'Test 2', date: '2024-01-02', userId: '1', tags: [] }
       ]
 
-      vi.mocked(axios.get).mockResolvedValueOnce({
+      vi.mocked(axiosInstance.get).mockResolvedValueOnce({
         status: 200,
         data: mockTransactions
       })
@@ -31,9 +32,9 @@ describe('Transactions API', () => {
     })
 
     it('handles unauthorized error', async () => {
-      vi.mocked(axios.get).mockRejectedValueOnce({
-        response: { status: 401 }
-      })
+      const error = new AxiosError()
+      error.response = { status: 401, data: {}, headers: {}, config: {} } as AxiosResponse
+      vi.mocked(axiosInstance.get).mockRejectedValueOnce(error)
 
       const result = await getTransactionsAll()
 
@@ -57,7 +58,7 @@ describe('Transactions API', () => {
         ...newTransaction
       }
 
-      vi.mocked(axios.post).mockResolvedValueOnce({
+      vi.mocked(axiosInstance.post).mockResolvedValueOnce({
         status: 200,
         data: mockResponse
       })
@@ -76,9 +77,9 @@ describe('Transactions API', () => {
         tags: []
       }
 
-      vi.mocked(axios.post).mockRejectedValueOnce({
-        response: { status: 400 }
-      })
+      const error = new AxiosError()
+      error.response = { status: 400, data: {}, headers: {}, config: {} } as AxiosResponse
+      vi.mocked(axiosInstance.post).mockRejectedValueOnce(error)
 
       const result = await createTransaction(invalidTransaction)
 
@@ -86,4 +87,4 @@ describe('Transactions API', () => {
       expect(result.error).toBe('Invalid transaction data')
     })
   })
-}) 
+})
