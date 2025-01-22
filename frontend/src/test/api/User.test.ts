@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import axios from 'axios'
+import axiosInstance from '../../utils/axios'
 import { RequestLogin, RequestRegister } from '../../api/User'
 import { setAuthToken } from '../../utils/axios'
 import { setSession } from '../../lib/localStorage'
+import { AxiosError, AxiosResponse } from 'axios'
 
-vi.mock('axios')
 vi.mock('../../utils/axios')
 vi.mock('../../lib/localStorage')
 
@@ -15,7 +15,7 @@ describe('User API', () => {
 
   describe('RequestRegister', () => {
     it('registers successfully', async () => {
-      vi.mocked(axios.post).mockResolvedValueOnce({
+      vi.mocked(axiosInstance.post).mockResolvedValueOnce({
         status: 201
       })
 
@@ -34,7 +34,7 @@ describe('User API', () => {
         }
       }
 
-      vi.mocked(axios.post).mockResolvedValueOnce(mockResponse)
+      vi.mocked(axiosInstance.post).mockResolvedValueOnce(mockResponse)
 
       const result = await RequestLogin('testuser', 'password')
 
@@ -45,9 +45,9 @@ describe('User API', () => {
     })
 
     it('handles invalid credentials', async () => {
-      vi.mocked(axios.post).mockRejectedValueOnce({
-        response: { status: 400 }
-      })
+      const error = new AxiosError()
+      error.response = { status: 400, data: {}, headers: {}, config: {} } as AxiosResponse
+      vi.mocked(axiosInstance.post).mockRejectedValueOnce(error)
 
       const result = await RequestLogin('wrong', 'wrong')
 
@@ -55,4 +55,4 @@ describe('User API', () => {
       expect(result.error).toBe('ユーザー名またはパスワードが無効です')
     })
   })
-}) 
+})
