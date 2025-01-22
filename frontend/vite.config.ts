@@ -7,7 +7,7 @@ export default defineConfig(({mode}) => {
   const env = loadEnv(mode, process.cwd(), '')
   
   return{
-    base: '/simple-wallet/',
+    base: '/simple_wallet/',
     plugins: [react()],
     server: {
       proxy: {
