@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
-import TagExpensesPieChart from '../components/dashboard/TagExpensesPieChart';
+//import TagExpensesPieChart from '../components/dashboard/TagExpensesPieChart';
 
 //hook import
 import { useTransactionData } from '../lib/useTransactionData';
@@ -80,12 +80,12 @@ const Dashboard = () => {
               loading={isLoading}
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          {/* <Grid item xs={12} md={6}>
             <TagExpensesPieChart 
               statistics={summaryData}
               loading={isLoading}
             />
-          </Grid>
+          </Grid> */}
           <Grid item xs={12}>
             <RecentTransactionsCard 
               transactions={Transactions} 
