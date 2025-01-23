@@ -151,7 +151,7 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
           />
 
           <TextField
-            label="説明"
+            label="説明(オプション)"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
