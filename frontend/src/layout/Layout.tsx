@@ -20,10 +20,10 @@ interface LayoutProps {
 
 const Layout = ({ children, hideAddButton = false }: LayoutProps) => {
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setSidebarOpen(!sidebarOpen);
   };
 
   return (
@@ -32,20 +32,20 @@ const Layout = ({ children, hideAddButton = false }: LayoutProps) => {
       <Box sx={{ display: 'flex' }}>
         <ButtonAppBar onMenuClick={handleDrawerToggle} />
 
-        {/* モバイル用Sidebar */}
+        {/* モバイルの場合 */}
         {isMobile && (
           <Sidebar
             variant="temporary"
-            open={mobileOpen}
+            open={sidebarOpen}
             onClose={handleDrawerToggle}
           />
         )}
 
-        {/* デスクトップ用Sidebar */}
+        {/* デスクトップの場合 */}
         {!isMobile && (
           <Sidebar
-            variant="permanent"
-            open={true}
+            variant="persistent"
+            open={sidebarOpen}
             onClose={handleDrawerToggle}
           />
         )}
@@ -58,6 +58,11 @@ const Layout = ({ children, hideAddButton = false }: LayoutProps) => {
             mt: 8,
             backgroundColor: 'background.default',
             minHeight: '100vh',
+            marginLeft: !isMobile ? (sidebarOpen ? '240px' : 0) : 0,  // 修正: 240pxを明示的に指定
+            transition: theme => theme.transitions.create('margin', {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.leavingScreen,
+            }),
           }}
         >
           {children}

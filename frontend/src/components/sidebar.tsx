@@ -11,7 +11,7 @@ import { logout } from '../lib/localStorage';
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
-  variant: "permanent" | "temporary";
+  variant: "permanent" | "temporary" | "persistent";
 }
 
 const drawerWidth = 240;

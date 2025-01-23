@@ -12,7 +12,10 @@ import {
   MenuItem,
   Typography, 
   Divider, 
-  Skeleton 
+  Skeleton,
+  Chip,
+  Box,
+  Stack
 } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
@@ -202,8 +205,35 @@ export default function RecentTransactionsCard({
                       )}
                     </ListItemIcon>
                     <ListItemText
-                      primary={transaction.description}
-                      secondary={new Date(transaction.date).toLocaleDateString('ja-JP')}
+                      primary={
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Stack spacing={1} sx={{ flex: 1 }}>
+                            <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                              {transaction.tags.map((tag, tagIndex) => (
+                                <Chip
+                                  key={tagIndex}
+                                  label={tag}
+                                  size="small"
+                                  sx={{ 
+                                    backgroundColor: 'primary.dark',
+                                    color: 'primary.contrastText',
+                                    borderRadius: '4px',
+                                    height: '24px',
+                                    fontSize: '0.875rem',
+                                    '& .MuiChip-label': {
+                                      padding: '0 8px'
+                                    }
+                                  }}
+                                />
+                              ))}
+                            </Stack>
+                            <Typography variant="body2" component="span">
+                              {new Date(transaction.date).toLocaleDateString('ja-JP')}
+                            </Typography>
+                          </Stack>
+                          <Typography sx={{ minWidth: '150px' }}>{transaction.description}</Typography>
+                        </Box>
+                      }
                     />
                     <Typography
                       variant='body1'
