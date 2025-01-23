@@ -63,7 +63,7 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
   }, [initialData, open, onTagsChange]); 
 
   const handleSubmit = () => {
-    if (!amount || !description || !date) return;
+    if (!amount || !date || selectedTags.length === 0) return;
 
     onSubmit({
       type,
@@ -172,7 +172,7 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
         <Button 
           onClick={handleSubmit} 
           variant="contained" 
-          disabled={!amount || parseInt(amount, 10)<=0 || !description || !date}
+          disabled={!amount || parseInt(amount, 10)<=0 || !date || selectedTags.length === 0}
         >
           {mode === 'create' ? '追加' : '更新'}
         </Button>
