@@ -114,22 +114,6 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
             fullWidth
           />
 
-          <TextField
-            label="説明"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-          />
-
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              label="日付"
-              value={date}
-              format='yyyy/MM/dd'
-              onChange={(newValue) => setDate(newValue)}
-            />
-          </LocalizationProvider>
-
           <Autocomplete
             multiple
             options={tags}
@@ -165,6 +149,22 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
               })
             }
           />
+
+          <TextField
+            label="説明"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+          />
+
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              label="日付"
+              value={date}
+              format='yyyy/MM/dd'
+              onChange={(newValue) => setDate(newValue)}
+            />
+          </LocalizationProvider>
         </Box>
       </DialogContent>
       <DialogActions>
