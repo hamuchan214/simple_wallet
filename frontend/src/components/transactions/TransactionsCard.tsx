@@ -116,7 +116,11 @@ export default function RecentTransactionsCard({
   const handleEdit = () => {
     if (selectedTransaction) {
       const initialTags = selectedTransaction.tags.map(tagName => 
-        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+        tags.find(tag => tag.name === tagName) || { 
+          id: '', 
+          name: tagName, 
+          type: selectedTransaction.amount > 0 ? 'income' : 'expense' 
+        } as APITag
       );
       setSelectedTags(initialTags);
       setEditDialogOpen(true);
@@ -161,7 +165,11 @@ export default function RecentTransactionsCard({
   useEffect(() => {
     if (selectedTransaction && editDialogOpen) {
       const initialTags = selectedTransaction.tags.map(tagName => 
-        tags.find(tag => tag.name === tagName) || { id: '', name: tagName }
+        tags.find(tag => tag.name === tagName) || { 
+          id: '', 
+          name: tagName, 
+          type: selectedTransaction.amount > 0 ? 'income' : 'expense' 
+        } as APITag
       );
       setSelectedTags(initialTags);
     }
