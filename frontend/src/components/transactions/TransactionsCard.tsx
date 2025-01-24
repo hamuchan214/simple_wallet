@@ -4,21 +4,16 @@ import {
   CardHeader, 
   List, 
   ListItem, 
-  ListItemText, 
-  ListItemIcon,
   ListItemSecondaryAction,
   IconButton,
   Menu,
   MenuItem,
   Typography, 
-  Divider, 
   Skeleton,
   Chip,
   Box,
   Stack
 } from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState, useEffect } from 'react';
 
@@ -198,72 +193,63 @@ export default function RecentTransactionsCard({
             {loading ? (
               [...Array(limit)].map((_, i) => (
                 <ListItem key={i}>
-                  <Skeleton variant='rectangular' width='100%' height={50} />
+                  <Skeleton variant="rectangular" width="100%" height={50} />
                 </ListItem>
               ))
             ) : (
-              displayTransactions.map((transaction, index) => (
-                <div key={transaction.id}>
-                  <ListItem>
-                    <ListItemIcon>
-                      {transaction.amount > 0 ? (
-                        <ArrowUpwardIcon color="success" />
-                      ) : (
-                        <ArrowDownwardIcon color='error' />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                          <Stack spacing={1} sx={{ flex: 1 }}>
-                            <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                              {transaction.tags.map((tag, tagIndex) => (
-                                <Chip
-                                  key={tagIndex}
-                                  label={tag}
-                                  size="small"
-                                  sx={{ 
-                                    backgroundColor: 'primary.dark',
-                                    color: 'primary.contrastText',
-                                    borderRadius: '4px',
-                                    height: '24px',
-                                    fontSize: '0.875rem',
-                                    '& .MuiChip-label': {
-                                      padding: '0 8px'
-                                    }
-                                  }}
-                                />
-                              ))}
-                            </Stack>
-                            <Typography variant="body2" component="span">
-                              {new Date(transaction.date).toLocaleDateString('ja-JP')}
-                            </Typography>
-                          </Stack>
-                          <Typography sx={{ minWidth: '150px' }}>{transaction.description}</Typography>
-                        </Box>
-                      }
-                    />
-                    <Typography
-                      variant='body1'
-                      sx={{
-                        color: transaction.amount > 0 ? 'success.main' : 'error.main',
-                        fontWeight: 'bold',
-                        mr: 2
-                      }}
-                    >
-                      ¥{transaction.amount.toLocaleString()}
-                    </Typography>
-                    <ListItemSecondaryAction>
-                      <IconButton 
-                        edge="end" 
-                        onClick={(e) => handleMenuOpen(e, transaction)}
+              displayTransactions.map((transaction) => (
+                <ListItem 
+                  key={transaction.id}
+                  sx={{
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    py: 2,
+                    '&:last-child': {
+                      borderBottom: 'none'
+                    }
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                      <Box>
+                        <Stack direction="row" spacing={1} mb={1}>
+                          {transaction.tags.map((tag) => (
+                            <Chip 
+                              key={tag} 
+                              label={tag} 
+                              size="medium"
+                              variant="outlined"
+                              sx={{
+                                borderWidth: 2,
+                                fontSize: '0.9rem'
+                              }}
+                            />
+                          ))}
+                        </Stack>
+                        {transaction.description && (
+                          <Typography variant="body2" color="text.secondary">
+                            {transaction.description}
+                          </Typography>
+                        )}
+                        <Typography variant="caption" color="text.secondary">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                      <Typography 
+                        variant="h6"
+                        color={transaction.amount > 0 ? 'success.main' : 'error.main'}
+                        sx={{ fontWeight: 'medium' }}
                       >
-                        <MoreVertIcon />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                  {index < displayTransactions.length - 1 && <Divider />}
-                </div>
+                        ¥{Math.abs(transaction.amount).toLocaleString()}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={(e) => handleMenuOpen(e, transaction)}>
+                      <MoreVertIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
               ))
             )}
           </List>

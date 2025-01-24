@@ -29,7 +29,7 @@ export const useStatisticsData = (startDate?: Date, endDate?: Date) => {
         } finally {
             setIsLoading(false);
         }
-    }, [startDate, endDate]);
+    }, []);
 
     // 取引データが更新されたら統計も更新
     useEventBus(EVENT_TYPES.TRANSACTION_UPDATED, fetchData);

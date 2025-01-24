@@ -94,7 +94,13 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
             <Select
               value={type}
               label="取引種類"
-              onChange={(e) => setType(e.target.value as 'income' | 'expense')}
+              onChange={(e) => {
+                const newType = e.target.value as 'income' | 'expense';
+                setType(newType);
+                // 異なるタイプのタグを除外
+                const filteredTags = selectedTags.filter(tag => tag.type === newType);
+                onTagsChange(filteredTags);
+              }}
             >
               <MenuItem value="income">収入</MenuItem>
               <MenuItem value="expense">支出</MenuItem>
@@ -116,7 +122,7 @@ export default function TransactionDialog({ open, onClose, onSubmit, tags, selec
 
           <Autocomplete
             multiple
-            options={tags}
+            options={tags.filter(tag => tag.type === type)}
             value={selectedTags}
             onChange={(_, newValue) => {
               console.log('Selected tags changed:', newValue);
