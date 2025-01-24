@@ -46,6 +46,7 @@ model Transaction {
 model SystemTag {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  type      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -58,6 +59,7 @@ model CustomTag {
   id        Int      @id @default(autoincrement())
   userId    String   @map("user_id")
   name      String   @unique
+  type      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

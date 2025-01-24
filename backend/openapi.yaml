@@ -234,6 +234,21 @@ paths:
         - Tag
       security:
         - BearerAuth: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum:
+              - income
+              - expense
+        - in: query
+          name: owner
+          schema:
+            type: string
+            enum:
+              - system
+              - custom
       responses:
         "200":
           description: List of tags
@@ -366,6 +381,12 @@ components:
         name:
           type: string
           description: tag name
+        type:
+          type: string
+          description: tag type
+          enum:
+            - income
+            - expense
 
     Tag:
       allOf:
