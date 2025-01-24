@@ -37,11 +37,11 @@ export interface Statistics {
     ]
 }
 
-export interface Tag{
+export interface Tag {
     name: string;
+    type: 'income' | 'expense';
 }
 
 export interface APITag extends Tag{
     id: string;
-    type: 'income' | 'expense';
 }
