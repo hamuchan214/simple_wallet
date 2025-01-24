@@ -43,4 +43,5 @@ export interface Tag{
 
 export interface APITag extends Tag{
     id: string;
+    type: 'income' | 'expense';
 }
