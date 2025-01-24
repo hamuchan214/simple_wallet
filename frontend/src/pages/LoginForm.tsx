@@ -197,7 +197,7 @@ const LoginForm = () => {
           <Typography sx={{ textAlign: "center" }}>
             アカウントが未登録ですか？
             <Link
-              href="/register"
+              href="/#/register"
               variant="body2"
               sx={{ alignSelf: "center", marginTop: 1 }}
             >

@@ -169,7 +169,7 @@ const Register = () => {
           <Typography sx={{ textAlign: "center" }}>
             既にアカウントをお持ちですか？
             <Link
-              href="/"
+              href="/#/"
               variant="body2"
               sx={{ alignSelf: "center", marginLeft: 1 }}
             >
