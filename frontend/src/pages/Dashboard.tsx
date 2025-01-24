@@ -7,7 +7,7 @@ import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
 import MonthlyStatistics from '../components/dashboard/MonthlyStatistics';
-//import TagExpensesPieChart from '../components/dashboard/TagExpensesPieChart';
+import ExpensesByTagPieChart from '../components/dashboard/ExpensesByTagPieChart';
 
 //hook import
 import { useTransactionData } from '../lib/useTransactionData';
@@ -82,6 +82,19 @@ const Dashboard = () => {
               isLoading={monthlyLoading}
             />
           </Grid>
+          <Grid item xs={12} md={6}>
+            <ExpensesByTagPieChart 
+              statistics={summaryData}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <RecentTransactionsCard 
+              transactions={Transactions} 
+              loading={isLoading}
+              limit={5}
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="総収入" 
@@ -104,19 +117,6 @@ const Dashboard = () => {
               amount={(summaryData?.totalIncome ?? 0) - (summaryData?.totalExpense ?? 0)}
               type="balance"
               loading={isLoading}
-            />
-          </Grid>
-          {/* <Grid item xs={12} md={6}>
-            <TagExpensesPieChart 
-              statistics={summaryData}
-              loading={isLoading}
-            />
-          </Grid> */}
-          <Grid item xs={12}>
-            <RecentTransactionsCard 
-              transactions={Transactions} 
-              loading={isLoading}
-              limit={5}
             />
           </Grid>
         </Grid>
