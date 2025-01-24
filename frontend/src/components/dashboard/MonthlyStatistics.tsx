@@ -22,7 +22,7 @@ export default function MonthlyStatistics({ statistics, isLoading }: MonthlyStat
             <Typography variant="subtitle2" color="text.secondary">
               収入
             </Typography>
-            <Typography variant="h6" color="success.main">
+            <Typography variant="h5" color="success.main">
               ¥{statistics?.totalIncome.toLocaleString() ?? 0}
             </Typography>
           </Grid>
@@ -30,7 +30,7 @@ export default function MonthlyStatistics({ statistics, isLoading }: MonthlyStat
             <Typography variant="subtitle2" color="text.secondary">
               支出
             </Typography>
-            <Typography variant="h6" color="error.main">
+            <Typography variant="h5" color="error.main">
               ¥{statistics?.totalExpense.toLocaleString() ?? 0}
             </Typography>
           </Grid>
@@ -39,7 +39,7 @@ export default function MonthlyStatistics({ statistics, isLoading }: MonthlyStat
               収支
             </Typography>
             <Typography 
-              variant="h6" 
+              variant="h5" 
               color={statistics?.balance && statistics.balance > 0 ? 'success.main' : 'error.main'}
             >
               ¥{statistics?.balance.toLocaleString() ?? 0}
