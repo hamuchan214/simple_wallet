@@ -1,32 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `Tag` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `TagsOnTransactions` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `Transaction` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Tag";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "TagsOnTransactions";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "Transaction";
-PRAGMA foreign_keys=on;
-
--- DropTable
-PRAGMA foreign_keys=off;
-DROP TABLE "User";
-PRAGMA foreign_keys=on;
-
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL PRIMARY KEY,
@@ -52,6 +23,7 @@ CREATE TABLE "transaction" (
 CREATE TABLE "system_tag" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL
 );
@@ -61,6 +33,7 @@ CREATE TABLE "custom_tag" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "user_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" DATETIME NOT NULL,
     CONSTRAINT "custom_tag_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user" ("id") ON DELETE RESTRICT ON UPDATE CASCADE

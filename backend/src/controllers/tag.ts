@@ -3,11 +3,18 @@ import { logger } from "../configs/logger";
 import { prisma, Prisma } from "../configs/prisma";
 
 export const createTag = async (req: Request, res: Response) => {
-  const { name } = req.body;
   try {
+    const { name, type } = req.body;
+    if (!name || !type) {
+      logger.warn(`Invalid tag data: ${req.body}`);
+      res.status(400).json({ error: `Invalid request.` });
+      return;
+    }
     const userId = req.user!.id;
 
-    const systemTag = await prisma.systemTag.findUnique({ where: { name } });
+    const systemTag = await prisma.systemTag.findUnique({
+      where: { name, type },
+    });
     if (systemTag) {
       logger.warn(`Tag "${name}" is reserved by the system`);
       res
@@ -17,17 +24,11 @@ export const createTag = async (req: Request, res: Response) => {
     }
 
     const tag = await prisma.customTag.create({
-      data: { userId, name },
+      data: { userId, name, type },
     });
     logger.info("Tag created successfully");
     res.json(tag);
   } catch (error) {
-    logger.error(`Error creating tag:`, error);
-    if (!name) {
-      logger.warn(`Cannot create empty tag`);
-      res.status(409).json({ error: `Cannot create empty tag.` });
-      return;
-    }
     if (
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2002"
@@ -36,6 +37,7 @@ export const createTag = async (req: Request, res: Response) => {
       res.status(409).json({ error: `Tag "${name}" already exists.` });
       return;
     }
+    logger.error(`Error creating tag:`, error);
     if (error instanceof Error) {
       res.status(400).json({ error: error.message });
     } else {
@@ -47,16 +49,26 @@ export const createTag = async (req: Request, res: Response) => {
 export const getTags = async (req: Request, res: Response) => {
   try {
     const userId = req.user!.id;
+    const { type, owner } = req.query as { type?: string; owner?: string };
+    const tagTypeFilter =
+      type && ["income", "expense"].includes(type) ? { type: type } : {};
+
     const systemTags = await prisma.systemTag.findMany({
-      select: { name: true },
+      select: { name: true, type: true },
+      where: tagTypeFilter,
       orderBy: { id: "asc" },
     });
     const customTags = await prisma.customTag.findMany({
-      where: { userId },
-      select: { id: true, name: true },
+      where: { userId, ...tagTypeFilter },
+      select: { id: true, name: true, type: true },
       orderBy: { updatedAt: "desc" },
     });
-    const tags = [...systemTags, ...customTags];
+
+    const tags = [
+      ...(!owner || owner === "system" ? systemTags : []),
+      ...(!owner || owner === "custom" ? customTags : []),
+    ];
+
     logger.info("Tags retrieved successfully.");
     res.json(tags);
   } catch (error) {

@@ -44,23 +44,17 @@ const handleTransactionTags = async (
     }),
   ]);
 
-  // 存在するタグ名を記録
-  const existingTagNames = new Set([
+  // 存在するタグ名
+  const tagNames = new Set([
     ...systemTags.map((t) => t.name),
     ...customTags.map((t) => t.name),
   ]);
 
-  // 新規カスタムタグを作成
-  const newCustomTags = await Promise.all(
-    tags
-      .filter((tagName) => !existingTagNames.has(tagName))
-      .map((tagName) =>
-        tx.customTag.create({
-          data: { userId, name: tagName },
-          select: { id: true },
-        })
-      )
-  );
+  // タグが存在しない場合はエラー
+  if (tagNames.size !== tags.length) {
+    const invalidTags = tags.filter((t) => !tagNames.has(t));
+    throw new Error(`Invalid tags: ${invalidTags.join(", ")}`);
+  }
 
   // タグの紐付けを作成
   await Promise.all([
@@ -72,7 +66,7 @@ const handleTransactionTags = async (
         },
       })
     ),
-    ...[...customTags, ...newCustomTags].map((tag) =>
+    customTags.map((tag) =>
       tx.customTagsOnTransactions.create({
         data: {
           transactionId,
