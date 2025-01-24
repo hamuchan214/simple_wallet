@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Container, Grid, Snackbar, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,10 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
+import MonthlyStatistics from '../components/dashboard/MonthlyStatistics';
 //import TagExpensesPieChart from '../components/dashboard/TagExpensesPieChart';
 
 //hook import
 import { useTransactionData } from '../lib/useTransactionData';
+import { useStatisticsData } from '../lib/useStatisticsData';
 
 //lib import
 import { checkSession } from '../lib/localStorage';
@@ -17,12 +19,29 @@ import { checkSession } from '../lib/localStorage';
 const Dashboard = () => {
 
   const navigate = useNavigate();
+  const dates = useMemo(() => {
+    const startDate = new Date();
+    startDate.setDate(1);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const endDate = new Date();
+    endDate.setHours(23, 59, 59, 999);
+
+    return { startDate, endDate };
+  }, []);
+
+  const {
+    statistics: monthlyStats,
+    isLoading: monthlyLoading,
+    fetchData: fetchMonthlyStats
+  } = useStatisticsData(dates.startDate, dates.endDate);
+
   const {
     summaryData,
     Transactions,
     isLoading,
     error,
-    fetchData
+    fetchData: fetchTransactions
   } = useTransactionData();
 
   const [snackbar, setSnackbar] = useState({
@@ -39,8 +58,9 @@ const Dashboard = () => {
       return;
     }
 
-    fetchData();
-  }, [navigate, fetchData]);
+    fetchTransactions();
+    fetchMonthlyStats();
+  }, [navigate, fetchTransactions, fetchMonthlyStats]);
 
   useEffect(() => {
     if (error) {
@@ -54,11 +74,17 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <Container sx={{ mt: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <MonthlyStatistics 
+              statistics={monthlyStats}
+              isLoading={monthlyLoading}
+            />
+          </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
-              title="収入" 
+              title="総収入" 
               amount={summaryData?.totalIncome ?? 0}
               type="income"
               loading={isLoading}
@@ -66,7 +92,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
-              title="支出" 
+              title="総支出" 
               amount={summaryData?.totalExpense ?? 0}
               type="expense"
               loading={isLoading}
@@ -74,7 +100,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={4}>
             <SummaryCard 
-              title="残高" 
+              title="総残高" 
               amount={(summaryData?.totalIncome ?? 0) - (summaryData?.totalExpense ?? 0)}
               type="balance"
               loading={isLoading}
@@ -90,6 +116,7 @@ const Dashboard = () => {
             <RecentTransactionsCard 
               transactions={Transactions} 
               loading={isLoading}
+              limit={5}
             />
           </Grid>
         </Grid>
