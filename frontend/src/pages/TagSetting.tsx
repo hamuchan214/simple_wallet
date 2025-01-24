@@ -13,7 +13,9 @@ import {
   Snackbar,
   Alert,
   Paper,
-  Tooltip
+  Tooltip,
+  Select,
+  MenuItem
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -27,6 +29,7 @@ import WarningCard from '../components/WarningCard';
 const TagSetting = () => {
   const { tags, isLoading, error, fetchData } = useTagData();
   const [newTagName, setNewTagName] = useState('');
+  const [newTagType, setNewTagType] = useState<'income' | 'expense'>('expense');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTagId, setSelectedTagId] = useState<string | null>(null);
 
@@ -54,7 +57,10 @@ const TagSetting = () => {
     if (!newTagName.trim()) return;
 
     try {
-      const result = await createTag({ name: newTagName.trim() });
+      const result = await createTag({ 
+        name: newTagName.trim(),
+        type: newTagType
+      });
       if (result.success) {
         setSnackbar({
           open: true,
@@ -121,12 +127,15 @@ const TagSetting = () => {
               label="新しいタグ"
               value={newTagName}
               onChange={(e) => setNewTagName(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddTag();
-                }
-              }}
             />
+            <Select
+              value={newTagType}
+              onChange={(e) => setNewTagType(e.target.value as 'income' | 'expense')}
+              sx={{ minWidth: 120 }}
+            >
+              <MenuItem value="income">収入</MenuItem>
+              <MenuItem value="expense">支出</MenuItem>
+            </Select>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
@@ -149,19 +158,22 @@ const TagSetting = () => {
             ) : (
               tags.map((tag) => (
                 <ListItem key={tag.id} divider>
-                  <ListItemText primary={tag.name} />
+                  <ListItemText 
+                    primary={tag.name}
+                    secondary={tag.type === 'income' ? '収入' : '支出'}
+                  />
                   <ListItemSecondaryAction>
-                    <Tooltip title = {!tag.id ? "システムタグは削除できません" : ""}>
-                    <span>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleDeleteClick(tag.id)}
-                      disabled={!tag.id}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                    </span>
+                    <Tooltip title={!tag.id ? "システムタグは削除できません" : ""}>
+                      <span>
+                        <IconButton
+                          edge="end"
+                          aria-label="delete"
+                          onClick={() => handleDeleteClick(tag.id)}
+                          disabled={!tag.id}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </span>
                     </Tooltip>
                   </ListItemSecondaryAction>
                 </ListItem>
