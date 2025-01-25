@@ -52,31 +52,37 @@ export default function UpcomingPaymentsCard({ transactions, loading }: Upcoming
             >
               <Box sx={{ width: '100%' }}>
                 <Stack spacing={1}>
+                  <Stack direction="row" spacing={1}>
+                    {transaction.tags.map((tag) => (
+                      <Chip 
+                        key={tag}
+                        label={tag}
+                        size="medium"
+                        variant="outlined"
+                        sx={{
+                          borderWidth: 2,
+                          fontSize: '0.9rem'
+                        }}
+                      />
+                    ))}
+                  </Stack>
                   <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography>
-                      {new Date(transaction.date).toLocaleDateString()}
-                    </Typography>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(transaction.date).toLocaleDateString()}
+                      </Typography>
+                      {transaction.description && (
+                        <Typography variant="body1" color="text.secondary">
+                          {transaction.description}
+                        </Typography>
+                      )}
+                    </Stack>
                     <Typography 
                       variant="h6"
                       color={transaction.amount > 0 ? 'success.main' : 'error.main'}
                     >
                       ¥{Math.abs(transaction.amount).toLocaleString()}
                     </Typography>
-                  </Stack>
-                  {transaction.description && (
-                    <Typography color="text.secondary">
-                      {transaction.description}
-                    </Typography>
-                  )}
-                  <Stack direction="row" spacing={1}>
-                    {transaction.tags.map((tag) => (
-                      <Chip 
-                        key={tag}
-                        label={tag}
-                        size="small"
-                        variant="outlined"
-                      />
-                    ))}
                   </Stack>
                 </Stack>
               </Box>
