@@ -69,8 +69,21 @@ export default function WeeklyExpensesChart({ transactions, loading }: WeeklyExp
             ]}
             xAxis={[{
               data: data.map(([date]) => {
-                const [_year, month, day] = date.split('-');
-                return `${month}/${day}週`;
+                const weekStart = new Date(date);
+                const today = new Date();
+                const diffTime = today.getTime() - weekStart.getTime();
+                const diffWeeks = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000));
+
+                switch (diffWeeks) {
+                  case 0:
+                    return '今週';
+                  case 1:
+                    return '先週';
+                  case 2:
+                    return '先々週';
+                  default:
+                    return '3週間前';
+                }
               }),
               scaleType: 'band',
             }]}
