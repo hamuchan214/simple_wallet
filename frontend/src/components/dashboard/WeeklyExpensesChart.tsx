@@ -37,7 +37,13 @@ export default function WeeklyExpensesChart({ transactions, loading }: WeeklyExp
   const fourWeeksAgo = new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000);
 
   transactions
-    .filter(t => t.amount < 0 && new Date(t.date) >= fourWeeksAgo)
+    .filter(t => {
+      const transactionDate = new Date(t.date);
+      // 支出かつ、今日以前かつ、4週間以内のトランザクションのみ
+      return t.amount < 0 && 
+             transactionDate <= now && 
+             transactionDate >= fourWeeksAgo;
+    })
     .forEach(transaction => {
       const date = new Date(transaction.date);
       const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
