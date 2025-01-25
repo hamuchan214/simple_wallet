@@ -13,9 +13,11 @@ export default function UpcomingPaymentsCard({ transactions, loading }: Upcoming
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
 
   const upcomingTransactions = transactions
-    .filter(t => new Date(t.date) > today)
+    .filter(t => new Date(t.date) >= tomorrow)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   if (!upcomingTransactions.length) {
