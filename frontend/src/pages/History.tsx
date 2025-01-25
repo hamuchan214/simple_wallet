@@ -64,6 +64,11 @@ const History = () => {
       }
     },
     {
+      field: 'tags',
+      headerName: 'タグ',
+      width: 150
+    },
+    {
       field: 'amount',
       headerName: '金額',
       width: 150,
@@ -78,11 +83,6 @@ const History = () => {
       headerName: '説明',
       width: 200,
       flex: 1
-    },
-    {
-      field: 'tags',
-      headerName: 'タグ',
-      width: 200
     },
     {
       field: 'actions',
