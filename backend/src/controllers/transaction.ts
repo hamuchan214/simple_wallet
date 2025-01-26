@@ -66,7 +66,7 @@ const handleTransactionTags = async (
         },
       })
     ),
-    customTags.map((tag) =>
+    ...customTags.map((tag) =>
       tx.customTagsOnTransactions.create({
         data: {
           transactionId,
