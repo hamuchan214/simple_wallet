@@ -3,8 +3,8 @@ import { logger } from "../configs/logger";
 import { prisma, Prisma } from "../configs/prisma";
 
 export const createTag = async (req: Request, res: Response) => {
+  const { name, type } = req.body;
   try {
-    const { name, type } = req.body;
     if (!name || !type) {
       logger.warn(`Invalid tag data: ${req.body}`);
       res.status(400).json({ error: `Invalid request.` });
