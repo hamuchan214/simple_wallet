@@ -39,16 +39,20 @@ export default function WeeklyExpensesChart({ transactions, loading }: WeeklyExp
   transactions
     .filter(t => {
       const transactionDate = new Date(t.date);
-      // 支出かつ、今日以前かつ、4週間以内のトランザクションのみ
       return t.amount < 0 && 
              transactionDate <= now && 
              transactionDate >= fourWeeksAgo;
     })
     .forEach(transaction => {
       const date = new Date(transaction.date);
-      const weekStart = new Date(date.setDate(date.getDate() - date.getDay()));
-      const weekKey = weekStart.toISOString().split('T')[0];
+      // 月曜日を週の始まりとして計算
+      const weekStart = new Date(date);
+      const day = date.getDay();
+      const diff = day === 0 ? 6 : day - 1; // 日曜日は6日戻し、それ以外は月曜日まで戻す
+      weekStart.setDate(date.getDate() - diff);
+      weekStart.setHours(0, 0, 0, 0);
       
+      const weekKey = weekStart.toISOString().split('T')[0];
       const currentAmount = weeklyExpenses.get(weekKey) || 0;
       weeklyExpenses.set(weekKey, currentAmount + Math.abs(transaction.amount));
     });
@@ -73,6 +77,7 @@ export default function WeeklyExpensesChart({ transactions, loading }: WeeklyExp
                 color: theme.palette.info.main,
               },
             ]}
+            tooltip={{ trigger: 'axis' }}
             xAxis={[{
               data: data.map(([date]) => {
                 const weekStart = new Date(date);
