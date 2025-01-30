@@ -12,6 +12,7 @@ export default function Calendar() {
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
           locale={jaLocale}
+          firstDay={1}
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
