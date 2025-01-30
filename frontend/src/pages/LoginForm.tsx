@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
 import { Container } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import ForgotPassword from "../components/ForgotPassword";
 import axiosInstance, { setAuthToken } from "../utils/axios";
 import requests from "../utils/endpoints";
@@ -196,13 +196,12 @@ const LoginForm = () => {
           <Divider>or</Divider>
           <Typography sx={{ textAlign: "center" }}>
             アカウントが未登録ですか？
-            <Link
-              href="/simple_wallet/#/register"
-              variant="body2"
-              sx={{ alignSelf: "center", marginTop: 1 }}
+            <RouterLink
+              to="/register"
+              style={{ marginLeft: '4px' }}
             >
               新規登録
-            </Link>
+            </RouterLink>
           </Typography>
         </StyledCard>
       </Container>
