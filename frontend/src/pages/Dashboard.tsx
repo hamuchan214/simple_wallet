@@ -8,6 +8,8 @@ import SummaryCard from '../components/dashboard/SummaryCard';
 import RecentTransactionsCard from '../components/transactions/TransactionsCard';
 import MonthlyStatistics from '../components/dashboard/MonthlyStatistics';
 import ExpensesByTagPieChart from '../components/dashboard/ExpensesByTagPieChart';
+import WeeklyExpensesChart from '../components/dashboard/WeeklyExpensesChart';
+import UpcomingPaymentsCard from '../components/dashboard/UpcomingPaymentsCard';
 
 //hook import
 import { useTransactionData } from '../lib/useTransactionData';
@@ -85,6 +87,19 @@ const Dashboard = () => {
           <Grid item xs={12} md={6}>
             <ExpensesByTagPieChart 
               statistics={summaryData}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <WeeklyExpensesChart 
+              statistics={summaryData}
+              transactions={Transactions}
+              loading={isLoading}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <UpcomingPaymentsCard 
+              transactions={Transactions}
               loading={isLoading}
             />
           </Grid>

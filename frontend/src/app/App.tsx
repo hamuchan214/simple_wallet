@@ -5,6 +5,7 @@ import Dashboard from "../pages/Dashboard";
 import History from "../pages/History";
 import TagSetting from "../pages/TagSetting";
 import { navigationHelper } from "../utils/navigationHelper";
+import Calendar from "../pages/Calendar";
 
 const App = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const App = () => {
       <Route path="/" element={<LoginForm />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/calendar" element={<Calendar />} />
       <Route path="/history" element={<History />} />
       <Route path="/tag-setting" element={<TagSetting />} />
 

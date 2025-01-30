@@ -7,7 +7,7 @@ const root = ReactDOM.createRoot(document.getElementById("root")!);
 
 root.render(
   <React.StrictMode>
-    <HashRouter basename={import.meta.env.PROD ? '/simple_wallet' : '/'}>
+    <HashRouter>
       <App />
     </HashRouter>
   </React.StrictMode>
