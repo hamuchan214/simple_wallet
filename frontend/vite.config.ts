@@ -17,6 +17,9 @@ export default defineConfig(({mode}) => {
           rewrite: (path) => path.replace(/^\/api/, '')
         }
       }
+    },
+    css: {
+      modules: false,  // グローバルCSSを許可
     }
   }
 })
