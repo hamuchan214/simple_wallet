@@ -7,13 +7,12 @@ import {
   Card,
   CssBaseline,
   FormControl,
-  Link,
   CircularProgress,
   Divider,
 } from "@mui/material";
 import { ThemeProvider, createTheme, styled } from "@mui/material/styles";
 import { Container } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { AxiosError } from "axios";
 import requests from "../utils/endpoints";
 import axiosInstance, { setAuthToken } from "../utils/axios";
@@ -168,13 +167,12 @@ const Register = () => {
           <Divider>or</Divider>
           <Typography sx={{ textAlign: "center" }}>
             既にアカウントをお持ちですか？
-            <Link
-              href="/#/"
-              variant="body2"
-              sx={{ alignSelf: "center", marginLeft: 1 }}
+            <RouterLink
+              to="/"
+              style={{ marginLeft: '8px' }}
             >
               ログイン
-            </Link>
+            </RouterLink>
           </Typography>
         </StyledCard>
       </Container>

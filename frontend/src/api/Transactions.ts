@@ -260,3 +260,56 @@ export const deleteTransaction = async (
     error: "Failed to delete transaction",
   };
 };
+
+export const getTransactionsByPeriod = async (
+  startDate: Date,
+  endDate: Date
+): Promise<{
+  success: boolean;
+  transactions?: APITransaction[];
+  error?: string;
+}> => {
+  try {
+    const token = getAuthToken();
+
+    const response = await axiosInstance.get(requests.transactions, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+      },
+    });
+
+    if (response.status === 200) {
+      return {
+        success: true,
+        transactions: response.data,
+      };
+    }
+    return {
+      success: false,
+      error: "Failed to fetch transactions",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError && error.response?.status) {
+      switch (error.response.status) {
+        case 401:
+          return {
+            success: false,
+            error: "Unauthorized",
+          };
+        case 500:
+          return {
+            success: false,
+            error: "サーバーエラーが発生しました",
+          };
+      }
+    }
+    return {
+      success: false,
+      error: "サーバーに接続できません",
+    };
+  }
+};
