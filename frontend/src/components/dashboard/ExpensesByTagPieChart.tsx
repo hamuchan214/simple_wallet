@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
+import { Card, CardContent, Typography, Box } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import type { Statistics } from '../../model/apimodel';
 
@@ -8,8 +8,7 @@ interface ExpensesByTagPieChartProps {
 }
 
 export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesByTagPieChartProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 
   if (loading) {
     return <div>Loading...</div>;
@@ -39,8 +38,6 @@ export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesB
     }))
     .sort((a, b) => b.value - a.value); // 金額の大きい順にソート
 
-  // データ量が多い場合は下部にレジェンドを配置
-  const shouldUseLowerLegend = data.length > 5 || isMobile;
 
   return (
     <Card>
@@ -48,33 +45,44 @@ export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesB
         <Typography variant="h6" gutterBottom>
           タグ別支出（直近30日）
         </Typography>
-        <Box sx={{ width: '100%', height: shouldUseLowerLegend ? 500 : 400 }}>
+        <Box sx={{ 
+          width: '100%', 
+          height: 500,  // 高さを固定
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
           <PieChart
             series={[
               {
                 data,
                 highlightScope: { faded: 'global', highlighted: 'item' },
                 faded: { innerRadius: 30, additionalRadius: -30 },
-                arcLabel: (item) => `¥${item.value.toLocaleString()}`,  // 金額を表示
-                arcLabelMinAngle: 45,  // ラベルを表示する最小角度
-                innerRadius: 40,  // 内側の半径を大きく
-                outerRadius: shouldUseLowerLegend ? 150 : 130,  // 外側の半径を大きく
+                arcLabel: (item) => `¥${item.value.toLocaleString()}`,
+                arcLabelMinAngle: 45,
+                innerRadius: 40,
+                outerRadius: 150,
               },
             ]}
             slotProps={{
               legend: {
-                direction: shouldUseLowerLegend ? 'row' : 'column',
-                position: shouldUseLowerLegend
-                  ? { vertical: 'bottom', horizontal: 'middle' }
-                  : { vertical: 'middle', horizontal: 'right' },
-                padding: 12,  // パディングも少し大きく
-                itemMarkWidth: 10,  // マーカーも少し大きく
+                direction: 'row',
+                position: { vertical: 'bottom', horizontal: 'middle' },
+                padding: 24,
+                itemMarkWidth: 10,
                 itemMarkHeight: 10,
                 markGap: 8,
+                itemGap: 12
               },
             }}
+            margin={{ 
+              left: 80,
+              right: 80,
+              top: 20,
+              bottom: 80
+            }}
             width={undefined}
-            height={shouldUseLowerLegend ? 500 : 400}  // 全体の高さも大きく
+            height={500}
           />
         </Box>
       </CardContent>
