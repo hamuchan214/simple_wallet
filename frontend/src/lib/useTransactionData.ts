@@ -1,11 +1,16 @@
 import { useState, useCallback } from "react";
-import { getStatistics } from "../api/Statistic";
-import { getTransactionsAll } from "../api/Transactions";
+import { getStatistics, getStatisticsbyPeriod } from "../api/Statistic";
+import { getTransactionsAll, getTransactionsByPeriod } from "../api/Transactions";
 import { useEventBus } from "../utils/useEventBus";
 import { EVENT_TYPES } from "../utils/eventTypes";
 import type { Statistics, APITransaction } from "../model/apimodel";
 
-export const useTransactionData = () => {
+interface UseTransactionDataProps {
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export const useTransactionData = ({ startDate, endDate }: UseTransactionDataProps = {}) => {
     const [summaryData, setSummaryData] = useState<Statistics | null>(null);
     const [Transactions, setTransactions] = useState<APITransaction[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -17,15 +22,27 @@ export const useTransactionData = () => {
         
         try {
             const [stats, transactions] = await Promise.all([
-                getStatistics(),
-                getTransactionsAll()
+                startDate && endDate
+                    ? getStatisticsbyPeriod(startDate, endDate)
+                    : getStatistics(),
+                startDate && endDate
+                    ? getTransactionsByPeriod(startDate, endDate)
+                    : getTransactionsAll()
             ]);
 
             if (stats.success && stats.statistics) {
                 setSummaryData(stats.statistics);
             }
             if (transactions.success && transactions.transactions) {
-                setTransactions(transactions.transactions);
+                // 日付でフィルタリング
+                const filteredTransactions = startDate && endDate
+                    ? transactions.transactions.filter(t => {
+                        const date = new Date(t.date);
+                        return date >= startDate && date <= endDate;
+                    })
+                    : transactions.transactions;
+                    
+                setTransactions(filteredTransactions);
             }
         } catch (error) {
             setError('Failed to fetch data');
