@@ -21,7 +21,9 @@ import { checkSession } from '../lib/localStorage';
 const Dashboard = () => {
 
   const navigate = useNavigate();
-  const dates = useMemo(() => {
+  
+  // 月初から今日までの日付範囲
+  const monthDates = useMemo(() => {
     const startDate = new Date();
     startDate.setDate(1);
     startDate.setHours(0, 0, 0, 0);
@@ -32,12 +34,32 @@ const Dashboard = () => {
     return { startDate, endDate };
   }, []);
 
+  // 直近30日の日付範囲
+  const thirtyDaysDates = useMemo(() => {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - 30);
+    return { startDate, endDate };
+  }, []);
+
+  // 月次データ
   const {
     statistics: monthlyStats,
     isLoading: monthlyLoading,
     fetchData: fetchMonthlyStats
-  } = useStatisticsData(dates.startDate, dates.endDate);
+  } = useStatisticsData(monthDates.startDate, monthDates.endDate);
 
+  // 直近30日のデータ
+  const {
+    summaryData: thirtyDaysData,
+    isLoading: thirtyDaysLoading,
+    fetchData: fetchThirtyDaysData
+  } = useTransactionData({
+    startDate: thirtyDaysDates.startDate,
+    endDate: thirtyDaysDates.endDate
+  });
+
+  // 全期間のデータ
   const {
     summaryData,
     Transactions,
@@ -62,7 +84,8 @@ const Dashboard = () => {
 
     fetchTransactions();
     fetchMonthlyStats();
-  }, [navigate, fetchTransactions, fetchMonthlyStats]);
+    fetchThirtyDaysData();
+  }, [navigate, fetchTransactions, fetchMonthlyStats, fetchThirtyDaysData]);
 
   useEffect(() => {
     if (error) {
@@ -86,8 +109,8 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12} md={6}>
             <ExpensesByTagPieChart 
-              statistics={summaryData}
-              loading={isLoading}
+              statistics={thirtyDaysData}
+              loading={thirtyDaysLoading}
             />
           </Grid>
           <Grid item xs={12} md={6}>

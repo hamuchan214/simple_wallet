@@ -46,7 +46,7 @@ export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesB
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          タグ別支出
+          タグ別支出（直近30日）
         </Typography>
         <Box sx={{ width: '100%', height: shouldUseLowerLegend ? 500 : 400 }}>
           <PieChart
