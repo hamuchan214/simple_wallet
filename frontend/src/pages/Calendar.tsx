@@ -1,4 +1,4 @@
-import { Container, Box, Card, CardContent, Typography, Chip, Stack, Popper } from '@mui/material';
+import { Container, Box, Card, CardContent, Typography, Chip, Stack, Popper, Skeleton } from '@mui/material';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import jaLocale from '@fullcalendar/core/locales/ja';
@@ -9,6 +9,44 @@ import { useMemo, useEffect, useState } from 'react';
 import { EventInput } from '@fullcalendar/core';
 import { useNavigate } from 'react-router-dom';
 import { checkSession } from '../lib/localStorage';
+
+const CalendarSkeleton = () => (
+  <Box sx={{ width: '100%' }}>
+    {/* ヘッダー部分のスケルトン */}
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, px: 2 }}>
+      <Skeleton width={120} height={40} />
+      <Skeleton width={200} height={40} />
+      <Skeleton width={120} height={40} />
+    </Box>
+    
+    {/* 曜日ヘッダーのスケルトン */}
+    <Box sx={{ display: 'flex', mb: 1 }}>
+      {Array(7).fill(0).map((_, i) => (
+        <Skeleton 
+          key={i} 
+          width={`${100/7}%`} 
+          height={30} 
+          sx={{ mx: 0.5 }}
+        />
+      ))}
+    </Box>
+    
+    {/* カレンダー本体のスケルトン */}
+    {Array(6).fill(0).map((_, weekIndex) => (
+      <Box key={weekIndex} sx={{ display: 'flex', mb: 1 }}>
+        {Array(7).fill(0).map((_, dayIndex) => (
+          <Skeleton 
+            key={dayIndex}
+            variant="rounded"
+            width={`${100/7}%`}
+            height={120}
+            sx={{ mx: 0.5 }}
+          />
+        ))}
+      </Box>
+    ))}
+  </Box>
+);
 
 export default function Calendar() {
   const navigate = useNavigate();
@@ -46,7 +84,26 @@ export default function Calendar() {
   }, [Transactions]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Layout>
+        <Container 
+          maxWidth={false}
+          sx={{ 
+            mt: 4, 
+            mb: 4,
+            px: { xs: 2, sm: 4 },
+            display: 'flex',
+            justifyContent: 'center',
+            flexGrow: 1,
+            overflow: 'hidden',
+            maxWidth: '1600px',
+            margin: '0 auto'
+          }}
+        >
+          <CalendarSkeleton />
+        </Container>
+      </Layout>
+    );
   }
 
   return (
