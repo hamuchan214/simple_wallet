@@ -1,11 +1,23 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Container, Box, Snackbar, Alert } from '@mui/material';
-import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
+import { 
+  DataGrid, 
+  GridColDef, 
+  GridActionsCellItem,
+  GridRowModesModel,
+  GridRowModes,
+  GridRowModel,
+  GridEventListener,
+  GridRowEditStopReasons,
+  GridRowId,
+} from '@mui/x-data-grid';
 import { jaJP } from '@mui/x-data-grid/locales';
 import { useNavigate } from 'react-router-dom';
 import { checkSession } from '../lib/localStorage';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
+import EditIcon from '@mui/icons-material/Edit';
+import CancelIcon from '@mui/icons-material/Close';
 
 //api import
 import { updateTransaction } from '../api/Transactions';
@@ -60,14 +72,36 @@ const History = () => {
 
   const [showWarningCard, setShowWarningCard] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<number | null>(null);
+  const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
-  const handleSave = async (id: number, newData: any) => {
+  const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
+    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
+      event.defaultMuiPrevented = true;
+    }
+  };
+
+  const handleEditClick = (id: GridRowId) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+  };
+
+  const handleSaveClick = (id: GridRowId) => () => {
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
+  };
+
+  const handleCancelClick = (id: GridRowId) => () => {
+    setRowModesModel({
+      ...rowModesModel,
+      [id]: { mode: GridRowModes.View, ignoreModifications: true },
+    });
+  };
+
+  const processRowUpdate = async (newRow: GridRowModel) => {
     try {
-      const result = await updateTransaction(id, {
-        date: newData.date,
-        tags: newData.tags,
-        amount: newData.amount,
-        description: newData.description
+      const result = await updateTransaction(newRow.id, {
+        date: newRow.date,
+        tags: newRow.tags,
+        amount: newRow.amount,
+        description: newRow.description
       });
 
       if (result.success) {
@@ -76,15 +110,15 @@ const History = () => {
           message: '取引を更新しました',
           severity: 'success'
         });
-        emitEvent('transaction_updated');
+        fetchData();
+        return newRow;
       } else {
         setSnackbar({
           open: true,
           message: result.error || '取引の更新に失敗しました',
           severity: 'error'
         });
-        setSelectedTransaction(null);
-        setShowWarningCard(false);
+        throw new Error(result.error);
       }
     } catch (error) {
       setSnackbar({
@@ -92,6 +126,7 @@ const History = () => {
         message: '取引の更新に失敗しました',
         severity: 'error'
       });
+      throw error;
     }
   };
 
@@ -130,13 +165,9 @@ const History = () => {
       field: 'date',
       headerName: '日付',
       width: 150,
-      valueGetter: (value: string) => {
-        return new Date(value);
-      },
-      valueFormatter: (value: Date) => {
-        if (!value) return '';
-        return (value as Date).toLocaleDateString('ja-JP');
-      }
+      editable: true,
+      type: 'date',
+      valueGetter: (value: string) => new Date(value),
     },
     {
       field: 'tags',
@@ -152,14 +183,15 @@ const History = () => {
       type: 'number',
       headerAlign: 'left',
       align: 'left',
-      valueFormatter: (value: number) => {
-        return `￥${value.toLocaleString()}`;
-      }
+      valueFormatter: (params: { value: number | null | '' }) => {
+        if (params.value == null || params.value === '') return '';
+        return `￥${Number(params.value).toLocaleString()}`;
+      },
     },
     {
       field: 'description',
       headerName: '説明',
-      width: 150,
+      width: 200,
       flex: 1,
       editable: true,
     },
@@ -168,42 +200,54 @@ const History = () => {
       type: 'actions',
       headerName: '',
       width: 100,
-      getActions: (params) => [
-        <GridActionsCellItem
-          icon={<SaveIcon />}
-          label="保存"
-          onClick={() => handleSave(params.id as number, params.row)}
-        />,
-        <GridActionsCellItem
-          icon={<DeleteIcon />}
-          label="削除"
-          onClick={() => {
-            handleDelete(params.id as number);
-          }}
-        />,
-      ],
+      getActions: ({ id }) => {
+        const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+
+        if (isInEditMode) {
+          return [
+            <GridActionsCellItem
+              icon={<SaveIcon />}
+              label="保存"
+              onClick={handleSaveClick(id)}
+            />,
+            <GridActionsCellItem
+              icon={<CancelIcon />}
+              label="キャンセル"
+              onClick={handleCancelClick(id)}
+            />,
+          ];
+        }
+
+        return [
+          <GridActionsCellItem
+            icon={<EditIcon />}
+            label="編集"
+            onClick={handleEditClick(id)}
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="削除"
+            onClick={() => handleDelete(Number(id))}
+          />,
+        ];
+      },
     }
-  ], []);
+  ], [rowModesModel]);
 
   return (
     <Layout>
       <Container sx={{ mt: 4 }}>
-        <Box sx={{ 
-          height: 'calc(100vh - 200px)',
-          width: '100%',
-          '& .income': {
-            color: 'success.main',
-          },
-          '& .expense': {
-            color: 'error.main',
-          },
-        }}>
+        <Box sx={{ height: 'calc(100vh - 200px)', width: '100%' }}>
           <DataGrid
             rows={Transactions}
             columns={columns}
             loading={isLoading}
             localeText={jaJP.components.MuiDataGrid.defaultProps.localeText}
             editMode="row"
+            rowModesModel={rowModesModel}
+            onRowModesModelChange={(newModel) => setRowModesModel(newModel)}
+            onRowEditStop={handleRowEditStop}
+            processRowUpdate={processRowUpdate}
           />
         </Box>
       </Container>
@@ -216,10 +260,10 @@ const History = () => {
       </Snackbar>
       <WarningCard
         open={showWarningCard}
-        title='取引履歴の削除'
-        message='この取引を削除してもよろしいですか？'
-        onCancel={handleDeleteCancel}
+        title="取引の削除"
+        message="この取引を削除してもよろしいですか？"
         onConfirm={() => handleDeleteConfirm(selectedTransaction as number)}
+        onCancel={handleDeleteCancel}
       />
     </Layout>
   );
