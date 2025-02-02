@@ -210,36 +210,51 @@ export default function Calendar() {
       >
         {selectedEvent && (
           <Card sx={{ 
-            width: 300, 
+            width: 250, 
             boxShadow: 3,
             bgcolor: 'background.paper'
           }}>
             <CardContent>
               <Stack spacing={1.5}>
-                <Typography variant="h6" color={selectedEvent.extendedProps.amount > 0 ? 'success.main' : 'error.main'}>
-                  ¥{Math.abs(selectedEvent.extendedProps.amount).toLocaleString()}
-                </Typography>
-                
-                {selectedEvent.extendedProps.description && (
-                  <Typography variant="body1">
-                    {selectedEvent.extendedProps.description}
+                {/* 1行目: タグと金額 */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start'
+                }}>
+                  {/* タグ */}
+                  <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ flex: 1, mr: 1 }}>
+                    {selectedEvent.extendedProps.tags.map((tag: string) => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        size="small"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
+                  {/* 金額 */}
+                  <Typography 
+                    variant="h6" 
+                    color={selectedEvent.extendedProps.amount > 0 ? 'success.main' : 'error.main'}
+                    sx={{ whiteSpace: 'nowrap' }}
+                  >
+                    ¥{Math.abs(selectedEvent.extendedProps.amount).toLocaleString()}
                   </Typography>
-                )}
+                </Box>
 
-                <Typography variant="caption" color="text.secondary">
-                  {new Date(selectedEvent.startStr).toLocaleDateString()}
-                </Typography>
-
-                <Stack direction="row" spacing={1} flexWrap="wrap">
-                  {selectedEvent.extendedProps.tags.map((tag: string) => (
-                    <Chip
-                      key={tag}
-                      label={tag}
-                      size="small"
-                      variant="outlined"
-                    />
-                  ))}
-                </Stack>
+                {/* 2行目: 日付と説明 */}
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(selectedEvent.startStr).toLocaleDateString()}
+                  </Typography>
+                  {/* タイトルから説明部分を抽出して表示 */}
+                  {selectedEvent.title.split(' ').slice(1).join(' ') && (
+                    <Typography variant="body2" sx={{ mt: 0.5 }}>
+                      {selectedEvent.title.split(' ').slice(1).join(' ')}
+                    </Typography>
+                  )}
+                </Box>
               </Stack>
             </CardContent>
           </Card>
