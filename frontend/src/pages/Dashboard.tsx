@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Container, Grid, Snackbar, Alert } from '@mui/material';
+import { Container, Grid, Snackbar, Alert, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 //component import
@@ -119,12 +119,12 @@ const Dashboard = () => {
               transactions={Transactions}
               loading={isLoading}
             />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <UpcomingPaymentsCard 
-              transactions={Transactions}
-              loading={isLoading}
-            />
+            <Box sx={{ mt: 3 }}>
+              <UpcomingPaymentsCard 
+                transactions={Transactions}
+                loading={isLoading}
+              />
+            </Box>
           </Grid>
           <Grid item xs={12}>
             <RecentTransactionsCard 
