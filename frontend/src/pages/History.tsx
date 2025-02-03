@@ -183,10 +183,17 @@ const History = () => {
       type: 'number',
       headerAlign: 'left',
       align: 'left',
-      valueFormatter: (params: { value: number | null | '' }) => {
-        if (params.value == null || params.value === '') return '';
-        return `￥${Number(params.value).toLocaleString()}`;
+      valueGetter: (value) => {
+        if (!value) {
+          return value;
+        }
+        return Number(value);},
+      valueFormatter: (params) => {
+        if (!params || params == null || params === '') return '';
+        return `￥${Number(params).toLocaleString()}`;
       },
+      getApplyQuickFilterFn: undefined,
+      id: 'amount-field'
     },
     {
       field: 'description',
