@@ -18,6 +18,10 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import SaveIcon from '@mui/icons-material/Save';
 import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Close';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { ja } from 'date-fns/locale/ja';
 
 //api import
 import { updateTransaction } from '../api/Transactions';
@@ -167,7 +171,28 @@ const History = () => {
       width: 150,
       editable: true,
       type: 'date',
-      valueGetter: (value: string) => new Date(value),
+      valueGetter: (params) => new Date(params),
+      renderEditCell: (params) => (
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
+          <DatePicker
+            value={params.value}
+            onChange={(newValue) => {
+              params.api.setEditCellValue({
+                id: params.id,
+                field: params.field,
+                value: newValue
+              });
+            }}
+            format='yyyy/MM/dd'
+            slotProps={{
+              textField: {
+                size: 'small',
+                fullWidth: true
+              }
+            }}
+          />
+        </LocalizationProvider>
+      ),
     },
     {
       field: 'tags',
