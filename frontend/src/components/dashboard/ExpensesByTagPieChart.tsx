@@ -1,6 +1,7 @@
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Card, CardContent, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import type { Statistics } from '../../model/apimodel';
+import CardSkeleton from '../common/CardSkeleton';
 
 interface ExpensesByTagPieChartProps {
   statistics: Statistics | null;
@@ -8,10 +9,11 @@ interface ExpensesByTagPieChartProps {
 }
 
 export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesByTagPieChartProps) {
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CardSkeleton height={isMobile ? 400 : 500} />;
   }
 
   if (!statistics?.tagAmounts?.length) {
@@ -47,7 +49,7 @@ export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesB
         </Typography>
         <Box sx={{ 
           width: '100%', 
-          height: 500,  // 高さを固定
+          height: isMobile ? 400 : 500,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
@@ -60,29 +62,29 @@ export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesB
                 faded: { innerRadius: 30, additionalRadius: -30 },
                 arcLabel: (item) => `¥${item.value.toLocaleString()}`,
                 arcLabelMinAngle: 45,
-                innerRadius: 40,
-                outerRadius: 150,
+                innerRadius: isMobile ? 30 : 40,
+                outerRadius: isMobile ? 120 : 150,
               },
             ]}
             slotProps={{
               legend: {
                 direction: 'row',
                 position: { vertical: 'bottom', horizontal: 'middle' },
-                padding: 24,
+                padding: isMobile ? 16 : 24,
                 itemMarkWidth: 10,
                 itemMarkHeight: 10,
                 markGap: 8,
-                itemGap: 12
+                itemGap: isMobile ? 8 : 12
               },
             }}
             margin={{ 
-              left: 80,
-              right: 80,
+              left: isMobile ? 40 : 80,
+              right: isMobile ? 40 : 80,
               top: 20,
-              bottom: 80
+              bottom: isMobile ? 60 : 80
             }}
             width={undefined}
-            height={500}
+            height={isMobile ? 400 : 500}
           />
         </Box>
       </CardContent>

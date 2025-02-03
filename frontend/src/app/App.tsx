@@ -10,6 +10,9 @@ import Calendar from "../pages/Calendar";
 const App = () => {
   const navigate = useNavigate();
   navigationHelper.navigate = navigate;
+  if (import.meta.env.VITE_APP_ENV === 'prod') {
+    console.log = console.info = console.debug = console.warn = console.error = () => {};
+  }
   return (
     <Routes>
       {/* ログインページ */}

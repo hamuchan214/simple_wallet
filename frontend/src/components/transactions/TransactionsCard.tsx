@@ -210,7 +210,7 @@ export default function RecentTransactionsCard({
                   }}
                 >
                   <Box sx={{ flexGrow: 1 }}>
-                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                    <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Box>
                         <Stack direction="row" spacing={1} mb={1}>
                           {transaction.tags.map((tag) => (
@@ -235,13 +235,20 @@ export default function RecentTransactionsCard({
                           {new Date(transaction.date).toLocaleDateString()}
                         </Typography>
                       </Box>
-                      <Typography 
-                        variant="h6"
-                        color={transaction.amount > 0 ? 'success.main' : 'error.main'}
-                        sx={{ fontWeight: 'medium' }}
-                      >
-                        ¥{Math.abs(transaction.amount).toLocaleString()}
-                      </Typography>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center',
+                        height: '100%',
+                        minHeight: '64px' // タグやテキストの高さに合わせて調整
+                      }}>
+                        <Typography 
+                          variant="h6"
+                          color={transaction.amount > 0 ? 'success.main' : 'error.main'}
+                          sx={{ fontWeight: 'medium' }}
+                        >
+                          {transaction.amount > 0 ? '￥' : '-￥'}{Math.abs(transaction.amount).toLocaleString()}
+                        </Typography>
+                      </Box>
                     </Stack>
                   </Box>
                   <ListItemSecondaryAction>

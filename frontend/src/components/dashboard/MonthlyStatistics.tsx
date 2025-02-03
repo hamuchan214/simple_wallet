@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Grid } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Skeleton } from '@mui/material';
 import type { Statistics } from '../../model/apimodel';
 
 interface MonthlyStatisticsProps {
@@ -8,7 +8,21 @@ interface MonthlyStatisticsProps {
 
 export default function MonthlyStatistics({ statistics, isLoading }: MonthlyStatisticsProps) {
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <Card>
+        <CardContent>
+          <Skeleton variant="text" width="40%" height={32} sx={{ mb: 2 }} />
+          <Grid container spacing={2}>
+            {[1, 2, 3].map((item) => (
+              <Grid item xs={4} key={item}>
+                <Skeleton variant="text" width="60%" height={20} />
+                <Skeleton variant="text" width="80%" height={40} />
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

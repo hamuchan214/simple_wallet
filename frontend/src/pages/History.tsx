@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Container, Box, Snackbar, Alert } from '@mui/material';
+import { Container, Box, Snackbar, Alert, Autocomplete, TextField, Chip, Typography } from '@mui/material';
 import { 
   DataGrid, 
   GridColDef, 
@@ -77,6 +77,18 @@ const History = () => {
   const [showWarningCard, setShowWarningCard] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<number | null>(null);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+
+  // タグの一覧を取得するための状態を追加
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+
+  // タグ一覧を取得
+  useEffect(() => {
+    const uniqueTags = new Set<string>();
+    Transactions.forEach(transaction => {
+      transaction.tags.forEach(tag => uniqueTags.add(tag));
+    });
+    setAvailableTags(Array.from(uniqueTags));
+  }, [Transactions]);
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -197,8 +209,61 @@ const History = () => {
     {
       field: 'tags',
       headerName: 'タグ',
-      width: 150,
+      width: 200,
       editable: true,
+      renderCell: (params) => (
+        <Box sx={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          gap: 0.5,
+          alignItems: 'center',
+          height: '100%'
+        }}>
+          {params.value.map((tag: string) => (
+            <Chip
+              key={tag}
+              label={tag}
+              size="small"
+              variant="outlined"
+            />
+          ))}
+        </Box>
+      ),
+      renderEditCell: (params) => (
+        <Autocomplete
+          multiple
+          value={params.value}
+          onChange={(_, newValue) => {
+            params.api.setEditCellValue({
+              id: params.id,
+              field: params.field,
+              value: newValue
+            });
+          }}
+          options={availableTags}
+          freeSolo
+          size="small"
+          sx={{ width: '100%' }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              size="small"
+              sx={{ backgroundColor: 'background.paper' }}
+            />
+          )}
+          renderTags={(value: string[], getTagProps) =>
+            value.map((option: string, index: number) => (
+              <Chip
+                variant="outlined"
+                label={option}
+                size="small"
+                {...getTagProps({ index })}
+              />
+            ))
+          }
+        />
+      ),
     },
     {
       field: 'amount',
@@ -212,10 +277,24 @@ const History = () => {
         if (!value) {
           return value;
         }
-        return Number(value);},
-      valueFormatter: (params) => {
-        if (!params || params == null || params === '') return '';
-        return `￥${Number(params).toLocaleString()}`;
+        return Number(value);
+      },
+      renderCell: (params) => {
+        const amount = Number(params.value);
+        return (
+          <Box sx={{ 
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Typography
+              color={amount > 0 ? 'success.main' : 'error.main'}
+            >
+              {amount > 0 ? '￥' : '-￥'}{Math.abs(amount).toLocaleString()}
+            </Typography>
+          </Box>
+        );
       },
       getApplyQuickFilterFn: undefined,
       id: 'amount-field'
@@ -264,7 +343,7 @@ const History = () => {
         ];
       },
     }
-  ], [rowModesModel]);
+  ], [rowModesModel, availableTags]);
 
   return (
     <Layout>
