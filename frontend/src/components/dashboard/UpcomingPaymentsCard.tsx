@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, List, ListItem, Stack, Chip, Skeleton } from '@mui/material';
+import { Card, CardContent, Typography, Box, List, ListItem, Stack, Chip } from '@mui/material';
 import type { APITransaction } from '../../model/apimodel';
 import CardSkeleton from '../common/CardSkeleton';
 
