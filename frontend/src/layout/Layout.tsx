@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Box, CssBaseline, useMediaQuery } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
@@ -20,7 +20,14 @@ interface LayoutProps {
 
 const Layout = ({ children, hideAddButton = false }: LayoutProps) => {
   const isMobile = useMediaQuery(darkTheme.breakpoints.down('sm'));
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
+
+  // モバイル時にサイドバーを閉じる
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   const handleDrawerToggle = () => {
     setSidebarOpen(!sidebarOpen);
