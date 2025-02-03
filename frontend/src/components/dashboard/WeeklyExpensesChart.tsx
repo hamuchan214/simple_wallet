@@ -1,6 +1,7 @@
 import { Card, CardContent, Typography, Box, useTheme, useMediaQuery } from '@mui/material';
 import { BarChart } from '@mui/x-charts/BarChart';
 import type { Statistics, APITransaction } from '../../model/apimodel';
+import CardSkeleton from '../common/CardSkeleton';
 
 interface WeeklyExpensesChartProps {
   statistics: Statistics | null;
@@ -13,7 +14,7 @@ export default function WeeklyExpensesChart({ transactions, loading }: WeeklyExp
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CardSkeleton height={isMobile ? 300 : 250} />;
   }
 
   if (!transactions?.length) {

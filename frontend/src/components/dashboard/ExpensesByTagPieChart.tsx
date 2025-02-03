@@ -1,6 +1,7 @@
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import type { Statistics } from '../../model/apimodel';
+import CardSkeleton from '../common/CardSkeleton';
 
 interface ExpensesByTagPieChartProps {
   statistics: Statistics | null;
@@ -8,10 +9,8 @@ interface ExpensesByTagPieChartProps {
 }
 
 export default function ExpensesByTagPieChart({ statistics, loading }: ExpensesByTagPieChartProps) {
-
-
   if (loading) {
-    return <div>Loading...</div>;
+    return <CardSkeleton height={500} />;
   }
 
   if (!statistics?.tagAmounts?.length) {

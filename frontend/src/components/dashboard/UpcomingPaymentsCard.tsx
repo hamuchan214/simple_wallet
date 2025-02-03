@@ -1,5 +1,6 @@
-import { Card, CardContent, Typography, Box, List, ListItem, Stack, Chip } from '@mui/material';
+import { Card, CardContent, Typography, Box, List, ListItem, Stack, Chip, Skeleton } from '@mui/material';
 import type { APITransaction } from '../../model/apimodel';
+import CardSkeleton from '../common/CardSkeleton';
 
 interface UpcomingPaymentsCardProps {
   transactions: APITransaction[];
@@ -8,7 +9,7 @@ interface UpcomingPaymentsCardProps {
 
 export default function UpcomingPaymentsCard({ transactions, loading }: UpcomingPaymentsCardProps) {
   if (loading) {
-    return <div>Loading...</div>;
+    return <CardSkeleton height={400} />;
   }
 
   const today = new Date();
