@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Container, Box, Snackbar, Alert, Autocomplete, TextField, Chip } from '@mui/material';
+import { Container, Box, Snackbar, Alert, Autocomplete, TextField, Chip, Typography } from '@mui/material';
 import { 
   DataGrid, 
   GridColDef, 
@@ -277,10 +277,24 @@ const History = () => {
         if (!value) {
           return value;
         }
-        return Number(value);},
-      valueFormatter: (params) => {
-        if (!params || params == null || params === '') return '';
-        return `￥${Number(params).toLocaleString()}`;
+        return Number(value);
+      },
+      renderCell: (params) => {
+        const amount = Number(params.value);
+        return (
+          <Box sx={{ 
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <Typography
+              color={amount > 0 ? 'success.main' : 'error.main'}
+            >
+              {amount > 0 ? '￥' : '-￥'}{Math.abs(amount).toLocaleString()}
+            </Typography>
+          </Box>
+        );
       },
       getApplyQuickFilterFn: undefined,
       id: 'amount-field'
