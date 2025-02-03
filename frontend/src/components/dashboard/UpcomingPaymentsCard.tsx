@@ -25,10 +25,10 @@ export default function UpcomingPaymentsCard({ transactions, loading }: Upcoming
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            今後の支払い
+            今後の支払い・収入
           </Typography>
           <Typography color="text.secondary">
-            予定されている支払いはありません
+            予定されている支払い・収入はありません
           </Typography>
         </CardContent>
       </Card>
@@ -39,7 +39,7 @@ export default function UpcomingPaymentsCard({ transactions, loading }: Upcoming
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          今後の支払い
+          今後の支払い・収入
         </Typography>
         <List>
           {upcomingTransactions.map((transaction) => (
