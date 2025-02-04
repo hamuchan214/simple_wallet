@@ -10,7 +10,7 @@ import Calendar from "../pages/Calendar";
 const App = () => {
   const navigate = useNavigate();
   navigationHelper.navigate = navigate;
-  if (import.meta.env.VITE_APP_ENV === 'prod') {
+  if (import.meta.env.VITE_APP_ENV === 'production') {
     console.log = console.info = console.debug = console.warn = console.error = () => {};
   }
   return (
