@@ -25,20 +25,25 @@ export const createSavingsGoal = async(req: Request, res: Response) => {
         const userId = req.user!.id;
         const { name, targetAmount, deadline} = req.body as CreateSavingsGoalInput;
 
+        // deadlineが文字列の場合、ISO-8601形式に変換
+        const formattedDeadline = deadline ? new Date(deadline).toISOString() : null;
+
         const goal = await prisma.savingsGoal.create({
             data: {
                 name,
                 targetAmount,
-                deadline,
+                deadline: formattedDeadline,
                 userId,
                 currentAmount: 0,
                 isCompleted: false,
             },
         });
-    res.status(201).json(goal);
+        res.status(201).json(goal);
     }
     catch (error){
+        console.log(error);
         res.status(500).json({error: "Internal server error"});
+        logger.error(error);
     }
 };
 
