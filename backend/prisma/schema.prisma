@@ -21,6 +21,7 @@ model User {
 
   Transaction Transaction[]
   CustomTag   CustomTag[]
+  SavingsGoal SavingsGoal[]
 
   @@map("user")
 }
@@ -115,4 +116,39 @@ view TransactionWithTags {
 
   @@id([transactionId])
   @@map("transaction_with_tags")
+}
+
+// 貯金の目標設定
+model SavingsGoal {
+  id            Int       @id @default(autoincrement())
+  userId        String    @map("user_id")
+  name          String
+  targetAmount  Int       @map("target_amount")
+  currentAmount Int       @default(0) @map("current_amount")
+  deadline      DateTime?
+  isCompleted   Boolean   @default(false) @map("is_completed")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  user           User             @relation(fields: [userId], references: [id])
+  savingsHistory SavingsHistory[]
+
+  @@index([userId])
+  @@map("savings_goal")
+}
+
+// 貯金の履歴
+model SavingsHistory {
+  id          Int      @id @default(autoincrement())
+  goalId      Int      @map("goal_id")
+  amount      Int
+  description String?
+  date        DateTime
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  goal SavingsGoal @relation(fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@index([goalId])
+  @@map("savings_history")
 }
