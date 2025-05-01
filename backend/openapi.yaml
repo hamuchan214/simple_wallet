@@ -308,6 +308,136 @@ paths:
         "404":
           description: Tag not found
 
+  /savings:
+    get:
+      summary: Get all savings goals
+      tags:
+        - Savings
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of savings goals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SavingsGoal"
+        "401":
+          description: Unauthorized
+
+    post:
+      summary: Create a new savings goal
+      tags:
+        - Savings
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSavingsGoal"
+      responses:
+        "201":
+          description: Savings goal created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavingsGoal"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+
+  /savings/goals/{id}:
+    put:
+      summary: Update a savings goal
+      tags:
+        - Savings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSavingsGoal"
+      responses:
+        "200":
+          description: Savings goal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SavingsGoal"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "404":
+          description: Savings goal not found
+
+    delete:
+      summary: Delete a savings goal
+      tags:
+        - Savings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "204":
+          description: Savings goal deleted
+        "401":
+          description: Unauthorized
+        "404":
+          description: Savings goal not found
+
+  /savings/history:
+    post:
+      summary: Add savings history
+      tags:
+        - Savings
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSavingsHistory"
+      responses:
+        "201":
+          description: Savings history added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  history:
+                    $ref: "#/components/schemas/SavingsHistory"
+                  goal:
+                    $ref: "#/components/schemas/SavingsGoal"
+        "400":
+          description: Invalid input
+        "401":
+          description: Unauthorized
+        "404":
+          description: Savings goal not found
+
 components:
   schemas:
     AuthResponse:
@@ -397,6 +527,92 @@ components:
               type: number
               nullable: true
               description: Only exists in custom tag
+
+    CreateSavingsGoal:
+      type: object
+      required:
+        - name
+        - targetAmount
+      properties:
+        name:
+          type: string
+          description: Goal name
+        targetAmount:
+          type: number
+          description: Target amount to save
+        deadline:
+          type: string
+          format: date
+          description: Optional deadline for the goal
+
+    UpdateSavingsGoal:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Goal name
+        targetAmount:
+          type: number
+          description: Target amount to save
+        deadline:
+          type: string
+          format: date
+          description: Optional deadline for the goal
+
+    SavingsGoal:
+      allOf:
+        - $ref: "#/components/schemas/CreateSavingsGoal"
+        - type: object
+          properties:
+            id:
+              type: number
+            userId:
+              type: string
+            currentAmount:
+              type: number
+            isCompleted:
+              type: boolean
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    CreateSavingsHistory:
+      type: object
+      required:
+        - goalId
+        - amount
+        - date
+      properties:
+        goalId:
+          type: number
+          description: ID of the savings goal
+        amount:
+          type: number
+          description: Amount saved
+        description:
+          type: string
+          description: Optional description
+        date:
+          type: string
+          format: date
+          description: Date of the savings
+
+    SavingsHistory:
+      allOf:
+        - $ref: "#/components/schemas/CreateSavingsHistory"
+        - type: object
+          properties:
+            id:
+              type: number
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
 
   securitySchemes:
     BearerAuth:
