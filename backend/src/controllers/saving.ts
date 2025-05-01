@@ -3,7 +3,6 @@ import { prisma } from "../configs/prisma";
 import { logger } from "../configs/logger";
 
 import { CreateSavingsGoalInput, CreateSavingsHistoryInput,UpdateSavingsGoalInput } from "../models/saving";
-import { error } from "console";
 
 export const getSavingsGoals = async (req: Request, res:Response) => {
     try {
@@ -46,7 +45,7 @@ export const createSavingsGoal = async(req: Request, res: Response) => {
 export const deleteSavingsGoal = async (req:Request, res:Response) => {
     try{
         const { id } = req.params;
-        const userId = req.user?.id;
+        const userId = req.user!.id;
 
         await prisma.savingsGoal.delete({
             where: {id: Number(id), userId},
@@ -60,48 +59,50 @@ export const deleteSavingsGoal = async (req:Request, res:Response) => {
     }
 };
 
-export const addSavingsHistory = async (req:Request, res:Response) => {
-    try{
-        const { goalId, amount, description,date } = req.body as CreateSavingsHistoryInput;
-        const userId = req.user?.id;
+export const addSavingHistory = async (req: Request, res: Response) => {
+    try {
 
-        const goal = await prisma.savingsGoal.findFirst({
-            where: { id: goalId, userId },
-        });
-
-        if (!goal) {
-            return res.status(404).json({ error:"Savinggole not found"});
-        }
-
-        const history = await prisma.savingsHistory.create({
-            data: {
-                goalId,
-                amount,
-                description,
-                date
-            },
-        });
-
-        const updatedGoal = await prisma.savingsGoal.update({
-            where: { id: goalId },
-            data: {
-                currentAmount: goal.currentAmount + amount,
-                isCompleted: goal.currentAmount +amount >= goal.targetAmount,
-            },
-        });
-
-        res.status(201).json({history, goal:updatedGoal});
+      const userId = req.user!.id;
+      const { goalId, amount, description, date } = req.body as CreateSavingsHistoryInput;
+  
+      // 目標が存在し、ユーザーが所有していることを確認
+      const goal = await prisma.savingsGoal.findFirst({
+        where: { id: goalId, userId },
+      });
+  
+      if (!goal) {
+        return res.status(404).json({ error: "貯金目標が見つかりません" });
+      }
+  
+      const history = await prisma.savingsHistory.create({
+        data: {
+          goalId,
+          amount,
+          description,
+          date,
+        },
+      });
+  
+      // 現在の貯金額を更新
+      const updatedGoal = await prisma.savingsGoal.update({
+        where: { id: goalId },
+        data: {
+          currentAmount: goal.currentAmount + amount,
+          isCompleted: goal.currentAmount + amount >= goal.targetAmount,
+        },
+      });
+  
+      res.status(201).json({ history, goal: updatedGoal });
+    } catch (error) {
+      res.status(500).json({ error: "Internal server error" });
     }
-    catch(error) {
-        res.status(500).json({ error:"Internal server error"} );
-    }
-};
+  };
 
 export const updateSavingsGoal = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
       const { name, targetAmount, deadline } = req.body as UpdateSavingsGoalInput;
-      const userId = req.user?.id;
+      const userId = req.user!.id;
   
       const goal = await prisma.savingsGoal.update({
         where: { id: Number(id), userId },
