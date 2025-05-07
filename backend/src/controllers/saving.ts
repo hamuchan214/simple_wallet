@@ -61,9 +61,8 @@ export const deleteSavingsGoal = async (req:Request, res:Response) => {
     }
 };
 
-export const addSavingHistory = async (req: Request, res: Response) => {
+export const addSavingHistory = async (req: Request, res: Response): Promise<void> => {
     try {
-
       const userId = req.user!.id;
       const { goalId, amount, description, date } = req.body as CreateSavingsHistoryInput;
   
@@ -73,7 +72,8 @@ export const addSavingHistory = async (req: Request, res: Response) => {
       });
   
       if (!goal) {
-        return res.status(404).json({ error: "貯金目標が見つかりません" });
+        res.status(404).json({ error: "貯金目標が見つかりません" });
+        return;
       }
   
       const history = await prisma.savingsHistory.create({
@@ -81,7 +81,7 @@ export const addSavingHistory = async (req: Request, res: Response) => {
           goalId,
           amount,
           description,
-          date,
+          date: new Date(date),
         },
       });
   

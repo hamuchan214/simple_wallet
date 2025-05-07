@@ -22,6 +22,6 @@ router.put("/goals/:id", updateSavingsGoal);
 router.delete("/goals/:id", deleteSavingsGoal);
 
 // POST /savings/history
-// router.post("/history", addSavingHistory);
+router.post("/history", addSavingHistory);
 
 export default router;
