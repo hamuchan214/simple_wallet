@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Container, Grid, Snackbar, Alert, Box } from '@mui/material';
+import { Container, Grid, Snackbar, Alert, Box, CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 //component import
@@ -19,7 +19,6 @@ import { useStatisticsData } from '../lib/useStatisticsData';
 import { checkSession } from '../lib/localStorage';
 
 const Dashboard = () => {
-
   const navigate = useNavigate();
   
   // 月初から今日までの日付範囲
@@ -63,7 +62,7 @@ const Dashboard = () => {
   const {
     summaryData,
     Transactions,
-    isLoading,
+    isLoading: transactionsLoading,
     error,
     fetchData: fetchTransactions
   } = useTransactionData();
@@ -74,6 +73,34 @@ const Dashboard = () => {
     severity: 'error' as 'error' | 'success'
   });
 
+  // 全体的なローディング状態
+  const isLoading = useMemo(() => 
+    monthlyLoading || thirtyDaysLoading || transactionsLoading,
+    [monthlyLoading, thirtyDaysLoading, transactionsLoading]
+  );
+
+  // データの再取得
+  const refreshData = useMemo(() => async () => {
+    try {
+      await Promise.all([
+        fetchTransactions(),
+        fetchMonthlyStats(),
+        fetchThirtyDaysData()
+      ]);
+      setSnackbar({
+        open: true,
+        message: 'データを更新しました',
+        severity: 'success'
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: 'データの更新に失敗しました',
+        severity: 'error'
+      });
+    }
+  }, [fetchTransactions, fetchMonthlyStats, fetchThirtyDaysData]);
+
   useEffect(() => {
     const session = checkSession();
 
@@ -82,10 +109,8 @@ const Dashboard = () => {
       return;
     }
 
-    fetchTransactions();
-    fetchMonthlyStats();
-    fetchThirtyDaysData();
-  }, [navigate, fetchTransactions, fetchMonthlyStats, fetchThirtyDaysData]);
+    refreshData();
+  }, [navigate, refreshData]);
 
   useEffect(() => {
     if (error) {
@@ -97,42 +122,26 @@ const Dashboard = () => {
     }
   }, [error]);
 
+  if (isLoading) {
+    return (
+      <Layout>
+        <Box 
+          display="flex" 
+          justifyContent="center" 
+          alignItems="center" 
+          minHeight="80vh"
+        >
+          <CircularProgress />
+        </Box>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <MonthlyStatistics 
-              statistics={monthlyStats}
-              isLoading={monthlyLoading}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <ExpensesByTagPieChart 
-              statistics={thirtyDaysData}
-              loading={thirtyDaysLoading}
-            />
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <WeeklyExpensesChart 
-              statistics={summaryData}
-              transactions={Transactions}
-              loading={isLoading}
-            />
-            <Box sx={{ mt: 3 }}>
-              <UpcomingPaymentsCard 
-                transactions={Transactions}
-                loading={isLoading}
-              />
-            </Box>
-          </Grid>
-          <Grid item xs={12}>
-            <RecentTransactionsCard 
-              transactions={Transactions} 
-              loading={isLoading}
-              limit={5}
-            />
-          </Grid>
+          {/* サマリーカードを上部に移動 */}
           <Grid item xs={12} md={4}>
             <SummaryCard 
               title="総収入" 
@@ -157,6 +166,42 @@ const Dashboard = () => {
               loading={isLoading}
             />
           </Grid>
+
+          <Grid item xs={12}>
+            <MonthlyStatistics 
+              statistics={monthlyStats}
+              isLoading={monthlyLoading}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <ExpensesByTagPieChart 
+              statistics={thirtyDaysData}
+              loading={thirtyDaysLoading}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <WeeklyExpensesChart 
+              statistics={summaryData}
+              transactions={Transactions}
+              loading={isLoading}
+            />
+            <Box sx={{ mt: 3 }}>
+              <UpcomingPaymentsCard 
+                transactions={Transactions}
+                loading={isLoading}
+              />
+            </Box>
+          </Grid>
+
+          <Grid item xs={12}>
+            <RecentTransactionsCard 
+              transactions={Transactions} 
+              loading={isLoading}
+              limit={5}
+            />
+          </Grid>
         </Grid>
       </Container>
       <Snackbar
@@ -165,8 +210,19 @@ const Dashboard = () => {
         onClose={() => setSnackbar(prev => ({ ...prev, open: false}))}
       >
         <Alert
-          severity='error'
+          severity={snackbar.severity}
           onClose={() => setSnackbar(prev => ({ ...prev, open: false}))}
+          action={
+            snackbar.severity === 'error' && (
+              <Alert
+                severity="info"
+                onClick={refreshData}
+                sx={{ cursor: 'pointer' }}
+              >
+                再試行
+              </Alert>
+            )
+          }
         >
           {snackbar.message}
         </Alert>
